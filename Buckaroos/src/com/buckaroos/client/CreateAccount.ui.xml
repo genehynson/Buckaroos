@@ -1,0 +1,21 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	
+	</ui:style>
+	<g:HTMLPanel>
+	    <g:Label ui:field="title" />
+	    <g:Label ui:field="accountNameTitle" />
+	    <g:Label ui:field="accountNickNameTitle" />
+	    <g:Label ui:field="startingBalanceTitle" />
+	    <g:Label ui:field="interestRateTitle" /> 
+	    <g:Button ui:field="create" />
+	    <g:TextBox ui:field="accountName" />
+	    <g:TextBox ui:field="accountNickName" />
+	    <g:TextBox ui:field="startingBalance" />
+	    <g:TextBox ui:field="interestRate" />
+	    	    	    
+	    
+	</g:HTMLPanel>
+</ui:UiBinder> 
