@@ -266,6 +266,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
 			query.setString(7, transactionDate);
 			query.setString(8, transactionTime);
 			query.executeUpdate();
+			System.out.println("Passed execute update");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

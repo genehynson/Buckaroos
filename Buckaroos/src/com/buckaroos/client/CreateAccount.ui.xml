@@ -10,6 +10,7 @@
 	    <g:Label ui:field="accountNickNameTitle" />
 	    <g:Label ui:field="startingBalanceTitle" />
 	    <g:Label ui:field="interestRateTitle" /> 
+	    <g:Label ui:field="selectCurrency" /> 
 	    <g:Button ui:field="create" />
 	    <g:TextBox ui:field="accountName" />
 	    <g:TextBox ui:field="accountNickName" />

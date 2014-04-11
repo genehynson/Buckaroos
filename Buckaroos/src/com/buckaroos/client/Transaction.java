@@ -1,6 +1,7 @@
 package com.buckaroos.client;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,24 +31,34 @@ public class Transaction extends Composite {
 	
 	@UiField
 	Button save, back;
-	Label title, date, time, hours, minutes, amountTitle, categoryTitle, dollar;
+	Label title, date, time, hours, minutes, amountTitle, categoryTitle, dollar, selectCurrency;
 	TextBox amount, category;
 	RadioButton withdraw, deposit;
-	ListBox hourBox, minuteBox;
+	ListBox hourBox, minuteBox, currencyBox;
 	DatePicker datePicker;
 	
 	private ControllerInterface controller;
     private int hour, minute;
     private Panel vPanel, timePanel, radioPanel, buttonPanel, amountPanel;
+	private List<String> currencies;
+
 	
 	public Transaction() {
 		initWidget(uiBinder.createAndBindUi(this));
 		controller = new UserAccountController();
 		datePicker = new DatePicker();
 		datePicker.addStyleName("white-text");
+		selectCurrency = new Label();
+		selectCurrency.setText("Select Currency:");
+		selectCurrency.addStyleName("white-text");
     	hourBox = new ListBox();
     	minuteBox = new ListBox();
-    	
+    	currencyBox = new ListBox();
+		currencies = controller.getCurrencyTypes();
+		for (String currency : currencies) {
+			currencyBox.addItem(currency);
+		}
+		currencyBox.setItemSelected(0, true);
     	dollar = new Label();
     	dollar.setText("$");
     	dollar.addStyleName("white-text");
@@ -101,11 +112,13 @@ public class Transaction extends Composite {
 				if (!amount.getText().toString().equals("")) {
 					newAmount = Double.parseDouble(amount.getText().toString());
 					String categoryText = category.getText().toString().toLowerCase();
+					System.out.println(controller.getCurrentUser().getUsername());
+					System.out.println(controller.getCurrentAccount().getName());
 					if (withdraw.getValue()) {
-						controller.addWithdrawal(newAmount, "dollars", categoryText,
+						controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
 								chosen);
 					} else if (deposit.getValue()) {
-						controller.addDeposit(newAmount, "dollars", categoryText, chosen);
+						controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
 
 					}
 				}
@@ -148,12 +161,27 @@ public class Transaction extends Composite {
 		vPanel.add(datePicker);
 		vPanel.add(amountTitle);
 		vPanel.add(amountPanel);
+		vPanel.add(selectCurrency);
+		vPanel.add(currencyBox);
 		vPanel.add(categoryTitle);
 		vPanel.add(category);
 		vPanel.add(buttonPanel);
 		RootPanel.get("page").add(vPanel);
 		
 		
+	}
+	
+	public void setValues(String typeValue, double amountValue, String categoryValue, Date dateValue, String timeValue) {
+		amount.setText(String.valueOf(amountValue));
+		category.setText(categoryValue);
+		datePicker.setValue(dateValue);
+		if (typeValue.equals("Deposit")) {
+			deposit.setValue(true);
+		} else {
+			withdraw.setValue(true);
+		}
+		hourBox.setSelectedIndex(Integer.parseInt(timeValue.substring(0, 1)));
+		minuteBox.setSelectedIndex(Integer.parseInt(timeValue.substring(3, 4)));
 	}
 
 	private void createTimeBox() {

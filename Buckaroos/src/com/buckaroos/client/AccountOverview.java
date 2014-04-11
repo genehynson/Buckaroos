@@ -28,15 +28,18 @@ public class AccountOverview extends Composite {
 	}
 	@UiField
 	Label accountName, title;
-	Button menu, report, addTransaction;
+	Button menu, report, addTransaction, edit, delete;
 	FlexTable table;
 	
-	private UserAccountController controller;
+	private ControllerInterface controller;
 	private Panel vPanel, hPanel;
-
-	public AccountOverview(List<AccountTransaction> transactions) {
+	private int receiverRowIndex;
+	private List<AccountTransaction> transactions;
+	
+	public AccountOverview(List<AccountTransaction> theTransactions) {
 		initWidget(uiBinder.createAndBindUi(this));
 		controller = new UserAccountController();
+		transactions = theTransactions;
 		accountName = new Label();
 		accountName.addStyleName("white-text");
 		title = new Label();
@@ -51,22 +54,42 @@ public class AccountOverview extends Composite {
 		table = new FlexTable();
 		table.addStyleName("white-text");
 		accountName.setText(controller.getCurrentAccount().getName());
- 
+		edit = new Button("Edit");
+		edit.addStyleName("black-text");
+		delete = new Button("Delete");
+		delete.addStyleName("black-text");
+		edit.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				Cell cell = table.getCellForEvent(event);
+				receiverRowIndex = cell.getRowIndex();
+				controller.editTransaction(transactions.get(receiverRowIndex));
+				
+			}
+		});
+		delete.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				Cell cell = table.getCellForEvent(event);
+				receiverRowIndex = cell.getRowIndex();
+				controller.deleteTransaction(transactions.get(receiverRowIndex));
+			}
+		});
 		for (int i = 0; i < transactions.size(); i++) {
 			table.setText(i, 0, transactions.get(i).getCategory());
 			table.setText(i, 1, String.valueOf(transactions.get(i).getAmount()));
+			table.getCellFormatter().addStyleName(i, 0, "table-styling");
+			table.getCellFormatter().addStyleName(i, 1, "table-styling");
 		}
 		table.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
-				int receiverRowIndex = cell.getRowIndex();
-				//need this? Transaction overview? edit transaction?
+				receiverRowIndex = cell.getRowIndex();
+				table.setWidget(receiverRowIndex, 2, edit);
+				table.setWidget(receiverRowIndex, 3, delete);
 			}
 		});
 		
 		menu.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				//how will we display this? Go to ChanceAccount? 
 				RootPanel.get("page").clear();
 				controller.createChangeAccount();
 			}

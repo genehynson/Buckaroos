@@ -38,6 +38,8 @@ public class CurrencyInformationProvider implements CurrencyInformationInterface
             fullNameOfCurrency = "United Arab Emirates Dirhams";
         } else if (currencyAbbrev == Money.valueOf("BDT")) {
             fullNameOfCurrency = "Bangladeshi Taka";
+        } else if (currencyAbbrev == Money.valueOf("USD")) {
+        	fullNameOfCurrency = "United States Dollar";
         }
         return fullNameOfCurrency;
     }
@@ -74,6 +76,8 @@ public class CurrencyInformationProvider implements CurrencyInformationInterface
             symbol = "AED";
         } else if (currencyAbbrev == Money.valueOf("BDT")) {
             symbol = "\u09F3";
+        } else if (currencyAbbrev == Money.valueOf("USD")) {
+        	symbol = "$";
         }
         return symbol;
     }

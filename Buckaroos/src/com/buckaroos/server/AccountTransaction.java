@@ -132,4 +132,8 @@ public class AccountTransaction implements IsSerializable {
     public Date getCreationDate() {
         return dateCreated;
     }
+    
+    public String getTime() {
+    	return time;
+    }
 }

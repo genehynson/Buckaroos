@@ -1,5 +1,7 @@
 package com.buckaroos.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -8,7 +10,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -23,12 +27,12 @@ public class CreateAccount extends Composite {
 	interface CreateAccountUiBinder extends UiBinder<Widget, CreateAccount> {
 	}
 	@UiField
-	Label title, accountNameTitle, accountNickNameTitle, startingBalanceTitle, interestRateTitle;
+	Label title, accountNameTitle, accountNickNameTitle, startingBalanceTitle, interestRateTitle, selectCurrency;
 	TextBox accountName, accountNickName, startingBalance, interestRate;
-	Button create;
+	Button create, cancel;
 	
 	private UserAccountController controller;
-	private Panel vPanel;
+	private Panel vPanel, hPanel;
 
 	public CreateAccount() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -36,6 +40,9 @@ public class CreateAccount extends Composite {
 		title = new Label();
 		title.setText("Create New Account");
 		title.addStyleName("white-text");
+		selectCurrency = new Label();
+		selectCurrency.setText("Select Currency:");
+		selectCurrency.addStyleName("white-text");
 		accountNameTitle = new Label();
 		accountNameTitle.setText("Account Name");
 		accountNameTitle.addStyleName("white-text");
@@ -46,7 +53,7 @@ public class CreateAccount extends Composite {
 		startingBalanceTitle.setText("Starting Balance");
 		startingBalanceTitle.addStyleName("white-text");
 		interestRateTitle = new Label();
-		interestRateTitle.setText("Interest Rate");
+		interestRateTitle.setText("Interest Rate (.01 = 1%)");
 		interestRateTitle.addStyleName("white-text");
 		accountName = new TextBox();
 		accountNickName = new TextBox();
@@ -55,7 +62,16 @@ public class CreateAccount extends Composite {
 		accountName.addStyleName("field-box");
 		accountNickName.addStyleName("field-box");
 		startingBalance.addStyleName("field-box");
-		interestRateTitle.addStyleName("field-box");
+		interestRate.addStyleName("field-box");
+		cancel = new Button();
+		cancel.setText("Cancel");
+		cancel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				RootPanel.get("page").clear();
+				controller.createChangeAccount();
+			}
+		});
 		create = new Button();
 		create.setText("Create Account");
 		create.addClickHandler(new ClickHandler() {
@@ -95,7 +111,10 @@ public class CreateAccount extends Composite {
 		vPanel.add(startingBalance);
 		vPanel.add(interestRateTitle);
 		vPanel.add(interestRate);
-		vPanel.add(create);
+		hPanel = new HorizontalPanel();
+		hPanel.add(create);
+		hPanel.add(cancel);
+		vPanel.add(hPanel);
 		RootPanel.get("page").add(vPanel);
 	}
 	

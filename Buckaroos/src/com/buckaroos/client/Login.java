@@ -26,7 +26,7 @@ public class Login extends Composite {
 	@UiField
 	TextBox etUser, etPass;
 	Button bLogin;
-	Label title, username, password, subtitle1, subtitle2;
+	Label title, username, password, subtitle1, subtitle2, passwordReset;
 
 	private Panel vPanel;
     private ControllerInterface controller = new UserAccountController();
@@ -35,6 +35,19 @@ public class Login extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		title = new Label();
 		title.setText("buckaroos");
+		passwordReset = new Label("Forgot Password");
+		passwordReset.addStyleName("white-text");
+		passwordReset.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (etUser.getText().equals("") || etUser.getText().equals("Enter your login")) {					
+					controller.resetPassword(etUser.getText());
+					Window.alert("Email sent.");
+				} else {
+					Window.alert("Please enter username and try again.");
+				}
+			}
+		});
 		subtitle1 = new Label();
 		subtitle1.setText("Enter your login username and password.");
 		subtitle2 = new Label();
@@ -73,6 +86,7 @@ public class Login extends Composite {
 		vPanel.add(password);
 		vPanel.add(etPass);
 		vPanel.add(bLogin);
+		vPanel.add(passwordReset);
 		vPanel.add(subtitle2);
         RootPanel.get("page").clear();
 		RootPanel.get("page").add(vPanel);

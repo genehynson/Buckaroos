@@ -9,6 +9,8 @@ import java.util.Map;
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
 import com.buckaroos.server.User;
+import com.buckaroos.utility.CurrencyInformationProvider;
+import com.buckaroos.utility.Money;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo;
@@ -38,6 +40,9 @@ public class UserAccountController implements ControllerInterface {
     private String aPassword;
     private String aUsername;
     private String aEmail;
+    private CurrencyInformationProvider currency;
+    private List<String> currencies;
+    private Money Money;
     
     private static AccountOverview accountOverview;
     private static Reports reports;
@@ -45,10 +50,11 @@ public class UserAccountController implements ControllerInterface {
     private static CreateAccount createAccount;
     private static Login login;
     private static Register register;  
+    private static Transaction transaction;
     
-    private static Date beginDate;
-    private static Date theDate;
-    private static Date endDate;
+    private static String beginDate;
+    private static String theDate;
+    private static String endDate;
     
     private static DBConnectionAsync db;
     private AsyncCallback<User> callbackUser;
@@ -67,6 +73,9 @@ public class UserAccountController implements ControllerInterface {
     private boolean updateCurrentUser = false;
     private boolean doesLoginAccountExist = false;
     private boolean addAccount = false;
+    private boolean addTransaction = false;
+    private boolean changeDates = false;
+    private boolean deleteTransaction = false;
     
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
@@ -101,11 +110,18 @@ public class UserAccountController implements ControllerInterface {
     	callbackListTransactions = new CallbackHandler<List<AccountTransaction>>();
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
-
+    	
+    	reportTransactions = new HashMap<String, Double>();
+    	reportTransactionNames = new ArrayList<String>();
+    	
     	this.db = GWT.create(DBConnection.class);
     	ServiceDefTarget target = (ServiceDefTarget) this.db;
     	System.out.println(url);
     	target.setServiceEntryPoint(url);
+    	
+    	beginDate = new String();
+    	endDate = new String();
+    	theDate = new String();
     	
     }
     
@@ -127,7 +143,8 @@ public class UserAccountController implements ControllerInterface {
             String category, Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
-        db.addTransaction(currentAccount.getName(), user.getUsername(), amount,
+        addTransaction = true;
+        db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Withdrawal", currencyType, category, dateString, timeString, callbackTransaction);
     }
 
@@ -136,6 +153,7 @@ public class UserAccountController implements ControllerInterface {
             Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
+        addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Deposit", currencyType, category, dateString, timeString, callbackTransaction);
     }
@@ -242,7 +260,6 @@ public class UserAccountController implements ControllerInterface {
 //        System.out.println("aPassword: " + sb.toString());
 //        if (thePassword.equals(sb.toString())) {
     	if (thePassword.equals(aPassword)) {
-    		db.getUser(username, callbackUser);
     		return true;
     	}
     	user = null;
@@ -262,7 +279,7 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @param beginDate The beginDate to set.
      */
-    public static void setBeginDate(Date beginDate) {
+    public static void setBeginDate(String beginDate) {
     	UserAccountController.beginDate = beginDate;
     }
     
@@ -271,7 +288,7 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @param theDate The calendar date to set for a time period.
      */
-    public static void setTheDate(Date theDate) {
+    public static void setTheDate(String theDate) {
     	UserAccountController.theDate = theDate;
     }
     
@@ -285,7 +302,7 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @param endDate The endDate to set for a time period.
      */
-    public static void setEndDate(Date endDate) {
+    public static void setEndDate(String endDate) {
     	UserAccountController.endDate = endDate;
     }
     
@@ -336,7 +353,7 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @return The beginDate.
      */
-    public static Date getBeginDate() {
+    public static String getBeginDate() {
     	return beginDate;
     }
     
@@ -345,7 +362,7 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @return The calendar date object.
      */
-    public static Date getTheDate() {
+    public static String getTheDate() {
     	return theDate;
     }
     
@@ -354,8 +371,28 @@ public class UserAccountController implements ControllerInterface {
      * 
      * @return The endDate. The end date for a time period.
      */
-    public static Date getEndDate() {
+    public static String getEndDate() {
     	return endDate;
+    }
+    
+    public List<String> getCurrencyTypes() {
+    	currencies = new ArrayList<String>();
+    	currency = new CurrencyInformationProvider();
+    	currencies.add(currency.getFullCurrencyName(Money.USD));
+    	currencies.add(currency.getFullCurrencyName(Money.EUR));
+    	currencies.add(currency.getFullCurrencyName(Money.GBP));
+    	currencies.add(currency.getFullCurrencyName(Money.CAD));
+    	currencies.add(currency.getFullCurrencyName(Money.AUD));
+    	currencies.add(currency.getFullCurrencyName(Money.JPY));
+    	currencies.add(currency.getFullCurrencyName(Money.INR));
+    	currencies.add(currency.getFullCurrencyName(Money.CHF));
+    	currencies.add(currency.getFullCurrencyName(Money.RUB));
+    	currencies.add(currency.getFullCurrencyName(Money.BRL));
+    	currencies.add(currency.getFullCurrencyName(Money.MXN));
+    	currencies.add(currency.getFullCurrencyName(Money.CNY));
+    	currencies.add(currency.getFullCurrencyName(Money.AED));
+    	currencies.add(currency.getFullCurrencyName(Money.BDT));
+    	return currencies;
     }
 
 //==========================
@@ -365,8 +402,8 @@ public class UserAccountController implements ControllerInterface {
     @Override
     public void generateSpendingCategoryReport() {
     	db.getSpendingCategoryInfo(user.getUsername(),
-    			currentAccount.getName(), beginDate.toString(),
-    			endDate.toString(), callbackHashMap);
+    			currentAccount.getName(), beginDate,
+    			endDate, callbackHashMap);
     }
     
     @Override
@@ -387,6 +424,11 @@ public class UserAccountController implements ControllerInterface {
     @Override
     public void generateTransactionHistoryReport() {
     	// TODO Auto-generated method stub
+    }
+    
+    @Override
+    public void resetPassword(String username) {
+    	//send email
     }
 
 //===========================
@@ -416,15 +458,14 @@ public class UserAccountController implements ControllerInterface {
 				reports = new Reports(reportTransactions, reportTransactionNames);
 				createReports = false;
 			} else if (loginUser) {
-				if (result != null) {
-					user = (User) result;
-					isPasswordCorrect(user.getUsername(), aPassword, user.getPassword());
+				user = (User) result;
+				if (isPasswordCorrect(user.getUsername(), aPassword, user.getPassword())) {
 					RootPanel.get("page").clear();
 					createChangeAccount();
-					loginUser = false;
 				} else {
 					login.displayNotCorrect();
 				}
+				loginUser = false;
 			} else if (registerUser) {
 				RootPanel.get("page").clear();
 				createCreateAccount();
@@ -444,12 +485,27 @@ public class UserAccountController implements ControllerInterface {
 				userAccounts = (List<Account>) result;
 				createCreateAccount = false;
 			} else if (addAccount) {
-				if(doesAccountExist(currentAccount.getName())) {
+				if (doesAccountExist(currentAccount.getName())) {
 					createAccount.displayAccountAlreadyExists();
 				} else {
 					RootPanel.get("page").clear();
 					createChangeAccount();
 				}
+				addAccount = false;
+			} else if (addTransaction) {
+				RootPanel.get("page").clear();
+				createAccountOverview();
+				addTransaction = false;
+			} else if (changeDates) {
+				reportTransactions = (Map<String, Double>) result;
+				reportTransactionNames.addAll(reportTransactions.keySet());
+				System.out.println(reportTransactions.get("food"));
+				System.out.println(reportTransactions.size());
+				reports.setTransactionLists(reportTransactions, reportTransactionNames);
+				changeDates = false;
+			} else if (deleteTransaction) {
+				//do nothing
+				deleteTransaction = false;
 			} else if (result == null) {
 				System.out.println("Result is currently null");
 			}
@@ -464,12 +520,12 @@ public class UserAccountController implements ControllerInterface {
 	
 	public void createAccountOverview() {
 		createAccountOverview = true;
-        db.getAllTransactions(user.getUsername(),currentAccount.getName(), callbackListTransactions);
+        db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
 	}
 	
 	public void createReports() {
 		createReports = true;
-		generateAccountListingReport();
+		generateSpendingCategoryReport();
 	}
 	
 	public void createRegister() {
@@ -498,6 +554,27 @@ public class UserAccountController implements ControllerInterface {
 		aUsername = name;
 		aEmail = email;
     	doesLoginAccountExist(name);
+	}
+	
+	public void changeDates(String beforeDate, String afterDate) {
+		changeDates = true;
+		beginDate = beforeDate;
+		endDate = afterDate;
+		generateSpendingCategoryReport();
+	}
+	
+	public void editTransaction(AccountTransaction t) {
+		RootPanel.get("page").clear();
+		transaction = new Transaction();
+		Date d = convertStringToDate(t.getDate());
+		String time = d.getHours() + ":" + d.getMinutes();
+		transaction.setValues(t.getType(), t.getAmount(), t.getCategory(), d, time);
+		deleteTransaction(t);
+	}
+	
+	public void deleteTransaction(AccountTransaction t) {
+		deleteTransaction = true;
+		db.removeTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
 	}
 	
 }

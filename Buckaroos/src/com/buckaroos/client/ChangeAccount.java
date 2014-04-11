@@ -7,6 +7,8 @@ import com.buckaroos.server.Account;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -58,6 +60,8 @@ public class ChangeAccount extends Composite {
 			for (int i = 0; i < userAccounts.size(); i++) {
 				table.setText(i, 0, userAccounts.get(i).getName());
 				table.setText(i, 1, String.valueOf(userAccounts.get(i).getBalance()));
+				table.getCellFormatter().addStyleName(i, 0, "table-styling");
+				table.getCellFormatter().addStyleName(i, 1, "table-styling");
 			}
 		}
 		table.addClickHandler(new ClickHandler() {

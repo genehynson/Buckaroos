@@ -206,7 +206,16 @@ public interface ControllerInterface {
     public abstract void createReports();
     
     public abstract void loginUser(String username, String password);
+
+    public abstract void changeDates(String date1, String date2); 
     
     public abstract void registerUser(String name, String password, String email);
 
+	public abstract void deleteTransaction(AccountTransaction accountTransaction);
+
+	public abstract void editTransaction(AccountTransaction accountTransaction);
+
+	public abstract List<String> getCurrencyTypes();
+
+	public abstract void resetPassword(String string);
 }
