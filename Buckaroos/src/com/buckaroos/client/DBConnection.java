@@ -37,7 +37,14 @@ public interface DBConnection extends RemoteService {
 	
 	List<AccountTransaction> getAllTransactions(String username, String accountName);
 	
-	void removeTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime);
+	void deleteTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime);
 	
+	void sendResetPassword(String recipientEmail, String password, String username);
 	
+	void rollBackTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime);
+	
+	void sendWelcomeEmail(String recipientEmail, String username);
+	
+	void sendTransactionHistoryOfAllUserAccounts(String recipientEmail,
+            String username, List<AccountTransaction> transactions);
 }

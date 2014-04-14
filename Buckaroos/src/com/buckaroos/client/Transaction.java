@@ -54,7 +54,7 @@ public class Transaction extends Composite {
     	hourBox = new ListBox();
     	minuteBox = new ListBox();
     	currencyBox = new ListBox();
-		currencies = controller.getCurrencyTypes();
+		currencies = controller.getCurrencyFullNames();
 		for (String currency : currencies) {
 			currencyBox.addItem(currency);
 		}

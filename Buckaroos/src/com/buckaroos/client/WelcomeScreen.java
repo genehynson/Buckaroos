@@ -33,6 +33,7 @@ public class WelcomeScreen extends Composite implements EntryPoint {
 		initWidget(uiBinder.createAndBindUi(this));
     	String moduleRelativeURL = GWT.getModuleBaseURL() + "dBConnection";
 		controller = new UserAccountController(moduleRelativeURL);
+		onModuleLoad();
 	}
 	
     

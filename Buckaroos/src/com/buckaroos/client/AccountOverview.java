@@ -28,7 +28,7 @@ public class AccountOverview extends Composite {
 	}
 	@UiField
 	Label accountName, title;
-	Button menu, report, addTransaction, edit, delete;
+	Button menu, report, addTransaction, edit, delete, deleteAccount;
 	FlexTable table;
 	
 	private ControllerInterface controller;
@@ -43,14 +43,24 @@ public class AccountOverview extends Composite {
 		accountName = new Label();
 		accountName.addStyleName("white-text");
 		title = new Label();
-		title.setText("Account Overview");
+		title.setText("Account Overview for account: " + controller.getCurrentAccount().getName() + ". Balance: $" + controller.getCurrentAccount().getBalance());
 		title.addStyleName("white-text");
 		menu = new Button();
 		menu.setText("Select Account");
+		menu.addStyleName("blue-button");
+
+		deleteAccount = new Button();
+		deleteAccount.setText("Delete This Account");
+		deleteAccount.addStyleName("blue-button");
+
 		report = new Button();
 		report.setText("Reports");
+		report.addStyleName("blue-button");
+
 		addTransaction = new Button();
 		addTransaction.setText("New Transaction");
+		addTransaction.addStyleName("blue-button");
+
 		table = new FlexTable();
 		table.addStyleName("white-text");
 		accountName.setText(controller.getCurrentAccount().getName());
@@ -66,6 +76,15 @@ public class AccountOverview extends Composite {
 				
 			}
 		});
+		deleteAccount.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("page").clear();
+				controller.createChangeAccount();
+				
+				//TODO: actually delete the account
+				
+			}
+		});
 		delete.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
@@ -73,18 +92,34 @@ public class AccountOverview extends Composite {
 				controller.deleteTransaction(transactions.get(receiverRowIndex));
 			}
 		});
-		for (int i = 0; i < transactions.size(); i++) {
-			table.setText(i, 0, transactions.get(i).getCategory());
-			table.setText(i, 1, String.valueOf(transactions.get(i).getAmount()));
+		table.setText(0, 0, "Category");
+		table.setText(0, 1, "Amount");
+		table.setText(0, 2, "Currency");
+		table.setText(0, 3, "Type");
+		table.setText(0, 4, "Date");
+		
+		for (int i = 1; i < transactions.size(); i++) {
+			int index = i-1;
+			table.setText(i, 0, transactions.get(index).getCategory());
+			table.setText(i, 1, String.valueOf(transactions.get(index).getAmount()));
+			table.setText(i, 2, transactions.get(index).getCurrency());
+			table.setText(i, 3, transactions.get(index).getType());
+			table.setText(i, 4, transactions.get(index).getDate());
+
 			table.getCellFormatter().addStyleName(i, 0, "table-styling");
 			table.getCellFormatter().addStyleName(i, 1, "table-styling");
+			table.getCellFormatter().addStyleName(i, 2, "table-styling");
+			table.getCellFormatter().addStyleName(i, 3, "table-styling");
+			table.getCellFormatter().addStyleName(i, 4, "table-styling");
+
+
 		}
 		table.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
 				receiverRowIndex = cell.getRowIndex();
-				table.setWidget(receiverRowIndex, 2, edit);
-				table.setWidget(receiverRowIndex, 3, delete);
+				table.setWidget(receiverRowIndex, 5, edit);
+				table.setWidget(receiverRowIndex, 6, delete);
 			}
 		});
 		
@@ -113,6 +148,7 @@ public class AccountOverview extends Composite {
 		hPanel.add(menu);
 		hPanel.add(report);
 		hPanel.add(addTransaction);
+		hPanel.add(deleteAccount);
 		vPanel.add(title);
 		vPanel.add(table);
 		vPanel.add(hPanel);

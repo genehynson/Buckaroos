@@ -65,7 +65,7 @@ public class AccountTransaction implements IsSerializable {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	
 	/**
 	 * @param dateOfTransaction the dateOfTransaction to set
 	 */
@@ -117,6 +117,10 @@ public class AccountTransaction implements IsSerializable {
     	return amount;
     }
     
+    public String getCurrency() {
+    	return currency;
+    }
+    
     /**
      * Returns transaction's category
      * @return
@@ -136,4 +140,9 @@ public class AccountTransaction implements IsSerializable {
     public String getTime() {
     	return time;
     }
+
+	public boolean isRolledBack() {
+		// TODO copy new AccountTransaction
+		return false;
+	}
 }

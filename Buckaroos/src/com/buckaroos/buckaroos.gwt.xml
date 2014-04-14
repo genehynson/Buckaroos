@@ -6,6 +6,7 @@
 	<source path ="shared" />
 	<source path ="server" />
 	<source path ="utility" />
+	<source path ="javax.mail" />
 	
 	<entry-point class="com.buckaroos.client.WelcomeScreen"></entry-point>
 	<servlet path="/dBConnection" class="com.buckaroos.server.MySQLAccess" />

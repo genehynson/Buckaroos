@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -26,10 +27,10 @@ public class Register extends Composite {
 	@UiField
 	Label title, username, email, password, subtitle1, subtitle2;
 	TextBox etName, etEmail, etPass;
-	Button bRegister;
+	Button bRegister, back;
 	
 	private UserAccountController controller;
-	private Panel vPanel;
+	private Panel vPanel, hPanel;
 
 	public Register() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -54,7 +55,10 @@ public class Register extends Composite {
 		etPass.addStyleName("field-box");
 		bRegister = new Button();
 		bRegister.setText("Register");
-		bRegister.addStyleName("tile-button");
+		bRegister.addStyleName("blue-button");
+		back = new Button();
+		back.setText("Back");
+		back.addStyleName("tile-button");
 		title.addStyleName("faceletters");
 		title.addStyleName("white-text");
 		email.addStyleName("white-text");
@@ -76,6 +80,16 @@ public class Register extends Composite {
 				}
 			}
 		});
+		back.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				RootPanel.get("page").clear();
+				WelcomeScreen ws = new WelcomeScreen();
+			}
+		});
+		hPanel = new HorizontalPanel();
+		hPanel.add(bRegister);
+		hPanel.add(back);
 		vPanel.add(title);
 		vPanel.add(subtitle1);
 		vPanel.add(username);
@@ -84,7 +98,7 @@ public class Register extends Composite {
 		vPanel.add(etEmail);
 		vPanel.add(password);
 		vPanel.add(etPass);
-		vPanel.add(bRegister);
+		vPanel.add(hPanel);
 		vPanel.add(subtitle2);
 		RootPanel.get("page").add(vPanel);
 		

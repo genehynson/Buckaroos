@@ -1,5 +1,6 @@
 package com.buckaroos.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class UserAccountController implements ControllerInterface {
     private AsyncCallback<List<AccountTransaction>> callbackListTransactions;
     private AsyncCallback<ArrayList<Account>> callbackListAccounts;
     private AsyncCallback<HashMap<String, Double>> callbackHashMap;
+    private AsyncCallback callbackVoid;
 
     private boolean createChangeAccount = false;
     private boolean loginUser = false;
@@ -76,7 +78,8 @@ public class UserAccountController implements ControllerInterface {
     private boolean addTransaction = false;
     private boolean changeDates = false;
     private boolean deleteTransaction = false;
-    
+    private boolean sendingResetPasswordEmail = false;
+    private boolean sendingWelcomeEmail = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -91,6 +94,7 @@ public class UserAccountController implements ControllerInterface {
     	callbackListTransactions = new CallbackHandler<List<AccountTransaction>>();
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
+    	callbackVoid = new CallbackHandler();
 
     }
 
@@ -101,6 +105,8 @@ public class UserAccountController implements ControllerInterface {
     	callbackListTransactions = new CallbackHandler<List<AccountTransaction>>();
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
+    	callbackVoid = new CallbackHandler();
+
     }
     
     public UserAccountController(String url) {
@@ -110,6 +116,8 @@ public class UserAccountController implements ControllerInterface {
     	callbackListTransactions = new CallbackHandler<List<AccountTransaction>>();
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
+    	callbackVoid = new CallbackHandler();
+
     	
     	reportTransactions = new HashMap<String, Double>();
     	reportTransactionNames = new ArrayList<String>();
@@ -375,7 +383,7 @@ public class UserAccountController implements ControllerInterface {
     	return endDate;
     }
     
-    public List<String> getCurrencyTypes() {
+    public List<String> getCurrencyFullNames() {
     	currencies = new ArrayList<String>();
     	currency = new CurrencyInformationProvider();
     	currencies.add(currency.getFullCurrencyName(Money.USD));
@@ -392,6 +400,26 @@ public class UserAccountController implements ControllerInterface {
     	currencies.add(currency.getFullCurrencyName(Money.CNY));
     	currencies.add(currency.getFullCurrencyName(Money.AED));
     	currencies.add(currency.getFullCurrencyName(Money.BDT));
+    	return currencies;
+    }
+    
+    public List<String> getCurrencySymbols() {
+    	currencies = new ArrayList<String>();
+    	currency = new CurrencyInformationProvider();
+    	currencies.add(currency.getSymbolOfCurrency(Money.USD));
+    	currencies.add(currency.getSymbolOfCurrency(Money.EUR));
+    	currencies.add(currency.getSymbolOfCurrency(Money.GBP));
+    	currencies.add(currency.getSymbolOfCurrency(Money.CAD));
+    	currencies.add(currency.getSymbolOfCurrency(Money.AUD));
+    	currencies.add(currency.getSymbolOfCurrency(Money.JPY));
+    	currencies.add(currency.getSymbolOfCurrency(Money.INR));
+    	currencies.add(currency.getSymbolOfCurrency(Money.CHF));
+    	currencies.add(currency.getSymbolOfCurrency(Money.RUB));
+    	currencies.add(currency.getSymbolOfCurrency(Money.BRL));
+    	currencies.add(currency.getSymbolOfCurrency(Money.MXN));
+    	currencies.add(currency.getSymbolOfCurrency(Money.CNY));
+    	currencies.add(currency.getSymbolOfCurrency(Money.AED));
+    	currencies.add(currency.getSymbolOfCurrency(Money.BDT));
     	return currencies;
     }
 
@@ -428,7 +456,14 @@ public class UserAccountController implements ControllerInterface {
     
     @Override
     public void resetPassword(String username) {
-    	//send email
+    	sendingResetPasswordEmail = true;
+    	db.getUser(username, callbackUser);
+    }
+    
+    @Override
+    public void welcomeEmail(String username) {
+    	sendingWelcomeEmail = true;
+    	db.getUser(username, callbackUser);
     }
 
 //===========================
@@ -477,6 +512,7 @@ public class UserAccountController implements ControllerInterface {
 				if (result == null) {
 					registerUser = true;
 					storeAccount(aUsername, aPassword, aEmail);
+					welcomeEmail(user.getUsername());
 				} else {
 					register.displayAccountAlreadyExists();
 				}
@@ -506,6 +542,22 @@ public class UserAccountController implements ControllerInterface {
 			} else if (deleteTransaction) {
 				//do nothing
 				deleteTransaction = false;
+			} else if (sendingResetPasswordEmail) {
+				user = (User) result;
+				if (user != null) {
+					db.sendResetPassword(user.getEmail(), user.getPassword(), user.getUsername(), callbackVoid);
+					System.out.println("Not null...email should have sent");
+					Window.alert("Email sent.");
+				} else {
+					System.out.println("User is null");
+					Window.alert("Not valid username. Please enter valid username and try again.");
+				}
+				
+				sendingResetPasswordEmail = false;
+			} else if (sendingWelcomeEmail) {
+				user = (User) result;
+				db.sendWelcomeEmail(user.getEmail(), user.getEmail(), callbackVoid);
+				sendingWelcomeEmail = false;
 			} else if (result == null) {
 				System.out.println("Result is currently null");
 			}
@@ -574,7 +626,7 @@ public class UserAccountController implements ControllerInterface {
 	
 	public void deleteTransaction(AccountTransaction t) {
 		deleteTransaction = true;
-		db.removeTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
+		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
 	}
 	
 }

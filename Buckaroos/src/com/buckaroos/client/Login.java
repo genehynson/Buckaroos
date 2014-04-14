@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -25,10 +26,10 @@ public class Login extends Composite {
 
 	@UiField
 	TextBox etUser, etPass;
-	Button bLogin;
+	Button bLogin, back;
 	Label title, username, password, subtitle1, subtitle2, passwordReset;
 
-	private Panel vPanel;
+	private Panel vPanel, hPanel;
     private ControllerInterface controller = new UserAccountController();
     
 	public Login() {
@@ -40,12 +41,7 @@ public class Login extends Composite {
 		passwordReset.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (etUser.getText().equals("") || etUser.getText().equals("Enter your login")) {					
-					controller.resetPassword(etUser.getText());
-					Window.alert("Email sent.");
-				} else {
-					Window.alert("Please enter username and try again.");
-				}
+				controller.resetPassword(etUser.getText());
 			}
 		});
 		subtitle1 = new Label();
@@ -58,7 +54,10 @@ public class Login extends Composite {
 		password.setText("* Password:");
 		bLogin = new Button();
 		bLogin.setText("Sign in");
-		bLogin.addStyleName("tile-button");
+		bLogin.addStyleName("blue-button");
+		back = new Button();
+		back.setText("Back");
+		back.addStyleName("tile-button");
 		title.addStyleName("faceletters");
 		title.addStyleName("white-text");
 		subtitle1.addStyleName("white-text");
@@ -77,6 +76,16 @@ public class Login extends Composite {
 				controller.loginUser(etUser.getText(), etPass.getText());
 			}
 		});
+		back.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				RootPanel.get("page").clear();
+				WelcomeScreen ws = new WelcomeScreen();
+			}
+		});
+		hPanel = new HorizontalPanel();
+		hPanel.add(bLogin);
+		hPanel.add(back);
 		etUser.addStyleName("field-box");
 		etPass.addStyleName("field-box");
 		vPanel.add(title);
@@ -85,7 +94,7 @@ public class Login extends Composite {
 		vPanel.add(etUser);
 		vPanel.add(password);
 		vPanel.add(etPass);
-		vPanel.add(bLogin);
+		vPanel.add(hPanel);
 		vPanel.add(passwordReset);
 		vPanel.add(subtitle2);
         RootPanel.get("page").clear();

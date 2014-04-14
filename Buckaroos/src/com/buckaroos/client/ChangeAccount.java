@@ -43,6 +43,8 @@ public class ChangeAccount extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		createAccount = new Button();
 		createAccount.setText("Create New Account");
+		createAccount.addStyleName("blue-button");
+
 		createAccount.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("page").clear();
@@ -57,9 +59,13 @@ public class ChangeAccount extends Composite {
 		if (userAccounts == null) {
 			System.out.println("List is null!");
 		} else {
-			for (int i = 0; i < userAccounts.size(); i++) {
-				table.setText(i, 0, userAccounts.get(i).getName());
-				table.setText(i, 1, String.valueOf(userAccounts.get(i).getBalance()));
+			table.setText(0, 0, "Name");
+			table.setText(0, 1, "Balance");
+
+			for (int i = 1; i < userAccounts.size(); i++) {
+				int index = i - 1;
+				table.setText(i, 0, userAccounts.get(index).getName());
+				table.setText(i, 1, String.valueOf(userAccounts.get(index).getBalance()));
 				table.getCellFormatter().addStyleName(i, 0, "table-styling");
 				table.getCellFormatter().addStyleName(i, 1, "table-styling");
 			}

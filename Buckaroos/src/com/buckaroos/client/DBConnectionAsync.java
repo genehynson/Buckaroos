@@ -35,7 +35,16 @@ public interface DBConnectionAsync {
 	
 	void getAllTransactions(String username, String accountName, AsyncCallback<List<AccountTransaction>> callback);
 	
-	void removeTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime, AsyncCallback callback);
+	void deleteTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime, AsyncCallback callback);
+	
+	void rollBackTransaction(String username, String accountName, double amount, String category, String transactionDate, String transactionTime, AsyncCallback callback);
+	
+	void sendResetPassword(String recipientEmail, String password, String username, AsyncCallback callback);
+	
+	void sendWelcomeEmail(String recipientEmail, String username, AsyncCallback callback);
+	
+	void sendTransactionHistoryOfAllUserAccounts(String recipientEmail,
+            String username, List<AccountTransaction> transactions, AsyncCallback callback);
 	
 	
 }

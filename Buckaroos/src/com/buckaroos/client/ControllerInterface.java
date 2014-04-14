@@ -215,7 +215,10 @@ public interface ControllerInterface {
 
 	public abstract void editTransaction(AccountTransaction accountTransaction);
 
-	public abstract List<String> getCurrencyTypes();
+	public abstract List<String> getCurrencyFullNames();
 
 	public abstract void resetPassword(String string);
+	
+	public abstract void welcomeEmail(String username);
+
 }
