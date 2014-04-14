@@ -38,7 +38,7 @@ public class WelcomeScreen extends Composite implements EntryPoint {
 	
     
     @UiField
-    Button bReg, bLog, home;
+    Button bReg, bLog, logout;
     Label title;
     Label subtitle;
 
@@ -46,9 +46,9 @@ public class WelcomeScreen extends Composite implements EntryPoint {
 	public void onModuleLoad() {
         title = new Label();
         subtitle = new Label();
-        home = new Button();
-        home.setText("buckaroos");
-        home.addClickHandler(new ClickHandler() {
+        logout = new Button();
+        logout.setText("buckaroos");
+        logout.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 		        RootPanel.get("page").clear();

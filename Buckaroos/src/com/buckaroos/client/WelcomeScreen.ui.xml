@@ -6,7 +6,7 @@
 	</ui:style>
 	<g:HTMLPanel>
 	    <g:Button ui:field="bLog" />
-	    <g:Button ui:field="home" />
+	    <g:Button ui:field="logout" />
 	    <g:Label ui:field="title" />
 	    <g:Label ui:field="subtitle" />
 	    <g:Button ui:field="bReg" />

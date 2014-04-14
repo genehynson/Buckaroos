@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -32,11 +33,11 @@ public class ChangeAccount extends Composite {
 	@UiField
 	FlexTable table;
 	Label title;
-	Button createAccount;
+	Button createAccount, settings, logout;
 	
     private List<Account> userAccounts;
     private ControllerInterface controller;
-    private Panel vPanel;
+    private Panel vPanel, hPanel;
     
     
 	public ChangeAccount(List<Account> userAccounts) {
@@ -49,6 +50,25 @@ public class ChangeAccount extends Composite {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("page").clear();
 				controller.createCreateAccount();
+			}
+		});
+		settings = new Button();
+		settings.setText("Settings");
+		settings.addStyleName("blue-button");
+
+		settings.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				//TODO: create settings page to edit email, password
+			}
+		});
+		logout = new Button();
+		logout.setText("Logout");
+		logout.addStyleName("blue-button");
+
+		logout.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("page").clear();
+				WelcomeScreen ws = new WelcomeScreen();
 			}
 		});
 		title = new Label();
@@ -79,11 +99,15 @@ public class ChangeAccount extends Composite {
 		        controller.createAccountOverview();
 		    }
 		});
+		hPanel = new HorizontalPanel();
+		hPanel.add(createAccount);
+		hPanel.add(settings);
+		hPanel.add(logout);
 		title.addStyleName("white-text");
 		table.addStyleName("white-text");
 		vPanel.add(title);
 		vPanel.add(table);
-		vPanel.add(createAccount);
+		vPanel.add(hPanel);
 		RootPanel.get("page").add(vPanel);
 	}
 

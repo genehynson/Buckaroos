@@ -33,7 +33,7 @@ public class UserAccountController implements ControllerInterface {
 
     private static User user = new User(" ", " ", " ");
     private static Account currentAccount;
-    private static List<Account> userAccounts;
+    private static List<Account> userAccounts = new ArrayList<Account>();
     private static List<AccountTransaction> userTransactions;
     private static Map<String, Double> reportTransactions;
     private static List<String> reportTransactionNames;
