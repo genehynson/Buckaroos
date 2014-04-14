@@ -540,7 +540,8 @@ public class UserAccountController implements ControllerInterface {
 				reports.setTransactionLists(reportTransactions, reportTransactionNames);
 				changeDates = false;
 			} else if (deleteTransaction) {
-				//do nothing
+				RootPanel.get("page").clear();
+				createAccountOverview();
 				deleteTransaction = false;
 			} else if (sendingResetPasswordEmail) {
 				user = (User) result;
