@@ -20,10 +20,11 @@ public class AccountTransaction implements IsSerializable {
     private String dateOfTransaction;
     private Date dateCreated;
     private String time;
+    private boolean isRolledBack;
 
     public AccountTransaction(double amount, String currency, String type,
             String category, Date creationDate, String dateOfTransaction,
-            String time) {
+            String time, boolean isRolledBack) {
         this.type = type;
         this.amount = amount;
         this.currency = currency;
@@ -31,6 +32,7 @@ public class AccountTransaction implements IsSerializable {
         this.dateCreated = creationDate;
         this.dateOfTransaction = dateOfTransaction;
         this.time = time;
+        this.setRolledBack(isRolledBack);
     }
     
     @SuppressWarnings("unused")
@@ -142,7 +144,13 @@ public class AccountTransaction implements IsSerializable {
     }
 
 	public boolean isRolledBack() {
-		// TODO copy new AccountTransaction
-		return false;
+		return isRolledBack;
+	}
+
+	/**
+	 * @param isRolledBack the isRolledBack to set
+	 */
+	public void setRolledBack(boolean isRolledBack) {
+		this.isRolledBack = isRolledBack;
 	}
 }

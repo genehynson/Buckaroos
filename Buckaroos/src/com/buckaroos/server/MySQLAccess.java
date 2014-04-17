@@ -63,9 +63,11 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         }
         // setup the connection with the DB. This will change when
         // connecting to Deloitte's server
+//        connect = DriverManager
+//                .getConnection("jdbc:mysql://localhost:3306/test"
+//                        + "?user=root&password=buckaroos");
         connect = DriverManager
-                .getConnection("jdbc:mysql://localhost:3306/test"
-                        + "?user=root&password=buckaroos");
+                .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=bf0998d04fdec5&password=acf6b561");
     }
 
     /*
@@ -429,10 +431,12 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
                         .getString("TransactionDate");
                 String transactionTimeFound = aResultSet
                         .getString("TransactionTime");
+                String rollBack = aResultSet.getString("isRolledBack");
+                boolean isRolledBack = rollBack.equals("Y") ? true : false;
                 returnTransaction = new AccountTransaction(amountFound,
                         currencyType, transactionType, categoryFound,
                         creationDate, transactionDateFound,
-                        transactionTimeFound);
+                        transactionTimeFound, isRolledBack);
             }
         } catch (SQLException e) {
             System.out.println("Transaction not found");
@@ -448,8 +452,8 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
      *            retrieved
      * @param accountName The accountName with which the transactions are
      *            associated
-     * @return An ArrayList containing all the transactions in the database
-     *         associated with the passed in username and accountName
+     * @return A List containing all the transactions in the database associated
+     *         with the passed in username and accountName
      */
     public List<AccountTransaction> getAllTransactions(String username,
             String accountName) {
@@ -459,7 +463,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             String selectQuery = "SELECT * FROM Transactions "
                     + "WHERE Username = '" + username + "' AND AccountName = '"
                     + accountName
-                    + "' GROUP BY TransactionDate, TransactionTime";
+                    + "' ORDER BY TransactionDate, TransactionTime";
             ResultSet aResultSet = statement.executeQuery(selectQuery);
             while (aResultSet.next()) {
                 double amountFound = aResultSet.getDouble("Amount");
@@ -472,10 +476,12 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
                         .getString("TransactionDate");
                 String transactionTimeFound = aResultSet
                         .getString("TransactionTime");
+                String rollBack = aResultSet.getString("isRolledBack");
+                boolean isRolledBack = rollBack.equals("Y") ? true : false;
                 AccountTransaction foundTransaction = new AccountTransaction(
                         amountFound, currencyType, transactionType,
                         categoryFound, creationDate, transactionDateFound,
-                        transactionTimeFound);
+                        transactionTimeFound, isRolledBack);
                 transList.add(foundTransaction);
             }
         } catch (SQLException e) {
@@ -484,7 +490,6 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         }
         return transList;
     }
-
     /**
      * Rolls back a transaction from the database and updates the account's
      * balance to reflect that change
@@ -535,7 +540,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
 
     /**
      * Deletes a transaction from the database and updates the account's balance
-     * to reflect that change
+     * to reflect that change if it had not already been rolled back.
      * 
      * @param username The username with which the transaction is associated
      * @param accountName The name of the account to which the transaction was
@@ -551,20 +556,23 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             String transactionTime) {
         AccountTransaction theTransaction = getTransaction(username,
                 accountName, amount, category, transactionDate, transactionTime);
-        if (theTransaction != null && !theTransaction.isRolledBack()) {
+        if (theTransaction != null) {
             double amountToModify = theTransaction.getAmount();
-            String transactionType = theTransaction.getType();
-            if (transactionType.equals("Deposit")) {
-                // Make the amount negative to update the balance with a
-                // negative amount since we are removing a deposit
-                amountToModify = -amountToModify;
-            }
-            updateAccountBalance(username, accountName, amountToModify);
-            if (transactionType.equals("Deposit")) {
-                // Make the amount positive again if it is a deposit or the
-                // transaction won't be recognized and won't be removed from the
-                // database
-                amountToModify = -amountToModify;
+            if (!theTransaction.isRolledBack()) {
+                String transactionType = theTransaction.getType();
+                if (transactionType.equals("Deposit")) {
+                    // Make the amount negative to update the balance with a
+                    // negative amount since we are removing a deposit
+                    amountToModify = -amountToModify;
+                }
+                updateAccountBalance(username, accountName, amountToModify);
+                if (transactionType.equals("Deposit")) {
+                    // Make the amount positive again if it is a deposit or the
+                    // transaction won't be recognized and won't be removed from
+                    // the
+                    // database
+                    amountToModify = -amountToModify;
+                }
             }
             String updateQuery = "DELETE FROM Transactions "
                     + "WHERE Username = '" + username + "' AND AccountName = '"

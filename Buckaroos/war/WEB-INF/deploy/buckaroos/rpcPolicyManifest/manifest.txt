@@ -1,2 +1,3 @@
 # Module buckaroos
 # RPC service class, partial path of RPC policy file
+com.buckaroos.client.DBConnection, 2521ED847E96588E3EAF3982142EED93.gwt.rpc

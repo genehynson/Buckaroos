@@ -54,7 +54,7 @@ public class Transaction extends Composite {
     	hourBox = new ListBox();
     	minuteBox = new ListBox();
     	currencyBox = new ListBox();
-		currencies = controller.getCurrencyFullNames();
+		currencies = controller.getCurrencySymbols();
 		for (String currency : currencies) {
 			currencyBox.addItem(currency);
 		}
@@ -81,13 +81,15 @@ public class Transaction extends Composite {
     	hours.setText("Hours:");
     	hours.addStyleName("white-text");
     	minutes = new Label();
-    	minutes.setText("Minutes: ");
+    	minutes.setText(" : ");
     	minutes.addStyleName("white-text");
     	
     	
     	amount = new TextBox();
+		amount.addStyleName("field-box");
     	category = new TextBox();
-    	
+		category.addStyleName("field-box");
+
     	withdraw = new RadioButton("type");
     	deposit = new RadioButton("type");
     	withdraw.setText("Withdraw");
@@ -96,9 +98,9 @@ public class Transaction extends Composite {
     	deposit.addStyleName("white-text");
     	
     	createTimeBox();
-    	
     	save = new Button();
     	save.setText("Save");
+    	save.addStyleName("blue-button");
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("deprecation")
 			@Override
@@ -126,6 +128,7 @@ public class Transaction extends Composite {
 		});
 		back = new Button();
 		back.setText("Back");
+		back.addStyleName("blue-button");
 		back.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -139,7 +142,7 @@ public class Transaction extends Composite {
 		radioPanel.add(deposit);
 		
 		timePanel = new HorizontalPanel();
-		timePanel.add(hours);
+//		timePanel.add(hours);
 		timePanel.add(hourBox);
 		timePanel.add(minutes);
 		timePanel.add(minuteBox);

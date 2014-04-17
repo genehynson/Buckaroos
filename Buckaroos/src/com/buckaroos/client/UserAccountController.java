@@ -80,6 +80,8 @@ public class UserAccountController implements ControllerInterface {
     private boolean deleteTransaction = false;
     private boolean sendingResetPasswordEmail = false;
     private boolean sendingWelcomeEmail = false;
+    private boolean updateUser = false;
+    private boolean updateCurrentAccount = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -192,6 +194,15 @@ public class UserAccountController implements ControllerInterface {
 //                // Do Nothing
 //            }
     	}
+    }
+    
+    @Override
+    public void updateUser(String username, String password, String email) {
+    	user.setAccountName(username);
+    	user.setEmail(email);
+    	user.setPassword(password);
+    	db.updateUser(username, password, email, callbackUser);
+    	updateUser = true;
     }
     
 //=============================
@@ -382,7 +393,7 @@ public class UserAccountController implements ControllerInterface {
     public static String getEndDate() {
     	return endDate;
     }
-    
+    @Override
     public List<String> getCurrencyFullNames() {
     	currencies = new ArrayList<String>();
     	currency = new CurrencyInformationProvider();
@@ -403,6 +414,7 @@ public class UserAccountController implements ControllerInterface {
     	return currencies;
     }
     
+    @Override
     public List<String> getCurrencySymbols() {
     	currencies = new ArrayList<String>();
     	currency = new CurrencyInformationProvider();
@@ -508,6 +520,11 @@ public class UserAccountController implements ControllerInterface {
 			} else if (updateCurrentUser) {
 				user = (User) result;
 				updateCurrentUser = false;
+			} else if (updateCurrentAccount) {
+				currentAccount = (Account) result;
+				updateCurrentAccount = false;
+				db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
+				createAccountOverview = true;
 			} else if (doesLoginAccountExist) {
 				if (result == null) {
 					registerUser = true;
@@ -553,8 +570,12 @@ public class UserAccountController implements ControllerInterface {
 					System.out.println("User is null");
 					Window.alert("Not valid username. Please enter valid username and try again.");
 				}
-				
 				sendingResetPasswordEmail = false;
+			} else if (updateUser) {
+				RootPanel.get("page").clear();
+				createChangeAccount();
+				updateUser = false;
+				//do nothing
 			} else if (sendingWelcomeEmail) {
 				user = (User) result;
 				db.sendWelcomeEmail(user.getEmail(), user.getEmail(), callbackVoid);
@@ -572,8 +593,8 @@ public class UserAccountController implements ControllerInterface {
 	}
 	
 	public void createAccountOverview() {
-		createAccountOverview = true;
-        db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
+		updateCurrentAccount = true;
+        db.getAccount(user.getUsername(), currentAccount.getName(), callbackAccount);
 	}
 	
 	public void createReports() {

@@ -118,8 +118,10 @@ public class AccountOverview extends Composite {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
 				receiverRowIndex = cell.getRowIndex();
-				table.setWidget(receiverRowIndex, 5, edit);
-				table.setWidget(receiverRowIndex, 6, delete);
+				if (receiverRowIndex != 0) {
+					table.setWidget(receiverRowIndex, 5, edit);
+					table.setWidget(receiverRowIndex, 6, delete);
+				}
 			}
 		});
 		

@@ -220,5 +220,9 @@ public interface ControllerInterface {
 	public abstract void resetPassword(String string);
 	
 	public abstract void welcomeEmail(String username);
+	
+	public abstract void updateUser(String username, String password, String email);
+	
+	public abstract List<String> getCurrencySymbols();
 
 }

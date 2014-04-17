@@ -1,6 +1,7 @@
 /*fixes body padding for fixed navbar*/
 body { 
   padding-bottom: 70px; 
+  background-color: black;
 } 
 
 .white-text {

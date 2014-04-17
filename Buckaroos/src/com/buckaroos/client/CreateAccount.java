@@ -65,6 +65,7 @@ public class CreateAccount extends Composite {
 		interestRate.addStyleName("field-box");
 		cancel = new Button();
 		cancel.setText("Cancel");
+		cancel.addStyleName("blue-button");
 		cancel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -74,6 +75,7 @@ public class CreateAccount extends Composite {
 		});
 		create = new Button();
 		create.setText("Create Account");
+		create.addStyleName("blue-button");
 		create.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -58,7 +58,8 @@ public class ChangeAccount extends Composite {
 
 		settings.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				//TODO: create settings page to edit email, password
+				RootPanel.get("page").clear();
+				Settings s = new Settings(controller.getCurrentUser());
 			}
 		});
 		logout = new Button();
@@ -72,7 +73,7 @@ public class ChangeAccount extends Composite {
 			}
 		});
 		title = new Label();
-		title.setText("Select Account");
+		title.setText("Select Another Account");
 		controller = new UserAccountController();
 		table = new FlexTable();
 		vPanel = new VerticalPanel();
@@ -94,9 +95,11 @@ public class ChangeAccount extends Composite {
 		    public void onClick(ClickEvent event) {
 		        Cell cell = table.getCellForEvent(event);
 		        int receiverRowIndex = cell.getRowIndex();
-		        controller.setCurrentAccount(controller.getUserAccount(table.getText(receiverRowIndex, 0)));
-		        RootPanel.get("page").clear();
-		        controller.createAccountOverview();
+		        if (receiverRowIndex != 0) {
+		        	controller.setCurrentAccount(controller.getUserAccount(table.getText(receiverRowIndex, 0)));
+		        	RootPanel.get("page").clear();
+		        	controller.createAccountOverview();
+		        }
 		    }
 		});
 		hPanel = new HorizontalPanel();
