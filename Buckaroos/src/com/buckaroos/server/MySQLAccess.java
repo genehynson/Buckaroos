@@ -66,8 +66,13 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // connect = DriverManager
         // .getConnection("jdbc:mysql://localhost:3306/test"
         // + "?user=root&password=buckaroos");
+//        connect = DriverManager
+//                .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/cb_buckdata?user=bf0998d04fdec5&password=acf6b561");
+//        connect = DriverManager
+//              .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=&password=buckaroos101");
         connect = DriverManager
                 .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=bf0998d04fdec5&password=acf6b561");
+
     }
 
     /*
@@ -106,6 +111,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             query.executeUpdate();
             System.out.println("hello?");
         } catch (SQLException e) {
+        	System.out.println("Exception caught when adding user.");
             e.printStackTrace();
         }
     }
