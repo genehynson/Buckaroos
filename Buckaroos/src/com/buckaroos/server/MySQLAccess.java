@@ -1,4 +1,5 @@
 package com.buckaroos.server;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -22,7 +23,6 @@ import javax.mail.internet.MimeMessage;
 import com.buckaroos.client.DBConnection;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-
 //Download mysql server from here: http://dev.mysql.com/downloads/mysql/
 //and then set the server up on your computer to use for testing.
 //Once you create a password, change yourPasswordHere to whatever your password
@@ -39,10 +39,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private static final String USER_NAME = "thecodebusters.buckaroos"; // GMail
+    private static final long serialVersionUID = 1L;
+    private static final String USER_NAME = "thecodebusters.buckaroos"; // GMail
     private static final String PASSWORD = "buckaroos2014"; // GMail password
-	private Connection connect = null;
+    private Connection connect = null;
     private Statement statement = null;
     private PreparedStatement query = null;
 
@@ -63,9 +63,9 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         }
         // setup the connection with the DB. This will change when
         // connecting to Deloitte's server
-//        connect = DriverManager
-//                .getConnection("jdbc:mysql://localhost:3306/test"
-//                        + "?user=root&password=buckaroos");
+        // connect = DriverManager
+        // .getConnection("jdbc:mysql://localhost:3306/test"
+        // + "?user=root&password=buckaroos");
         connect = DriverManager
                 .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=bf0998d04fdec5&password=acf6b561");
     }
@@ -97,16 +97,17 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // Will have to change test to whatever the name of the DB is that is
         // hosted by Deloitte
         try {
-        	query = connect
-        			.prepareStatement("insert into test.Credentials values (?, ?, ?)");
-			query.setString(1, user.getUsername());
-			query.setString(2, user.getPassword());
-			query.setString(3, user.getEmail());
-			query.executeUpdate();
-			System.out.println("hello?");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+            query = connect
+                    .prepareStatement("insert into cb_buckdata.Credentials "
+                            + "values (?, ?, ?)");
+            query.setString(1, user.getUsername());
+            query.setString(2, user.getPassword());
+            query.setString(3, user.getEmail());
+            query.executeUpdate();
+            System.out.println("hello?");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -170,19 +171,19 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
      */
     public void addAccount(String username, Account account) {
         try {
-        	query = connect
-        			.prepareStatement("insert into test.Accounts (Username, "
-        					+ "AccountName, Balance, InterestRate, AccountNickName)"
-        					+ " values (?, ?, ?, ?, ?)");
-        	query.setString(1, username);
-        	query.setString(2, account.getName());
-			query.setDouble(3, account.getBalance());
-			query.setDouble(4, account.getInterestRate());
-			query.setString(5, account.getNickName());
-			query.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+            query = connect
+                    .prepareStatement("insert into cb_buckdata.Accounts (Username, "
+                            + "AccountName, Balance, InterestRate, AccountNickName)"
+                            + " values (?, ?, ?, ?, ?)");
+            query.setString(1, username);
+            query.setString(2, account.getName());
+            query.setDouble(3, account.getBalance());
+            query.setDouble(4, account.getInterestRate());
+            query.setString(5, account.getNickName());
+            query.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -265,24 +266,24 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             double amount, String transactionType, String currencyType,
             String category, String transactionDate, String transactionTime) {
         try {
-			query = connect
-			        .prepareStatement("insert into test.Transactions (Username, "
-			                + "AccountName, Amount, TransactionType, CurrencyType, "
-			                + "Category, TransactionDate, TransactionTime)"
-			                + " values (?, ?, ?, ?, ?, ?, ?, ?)");
-			query.setString(1, username);
-			query.setString(2, accountName);
-			query.setDouble(3, amount);
-			query.setString(4, transactionType);
-			query.setString(5, currencyType);
-			query.setString(6, category);
-			query.setString(7, transactionDate);
-			query.setString(8, transactionTime);
-			query.executeUpdate();
-			System.out.println("Passed execute update");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+            query = connect
+                    .prepareStatement("insert into cb_buckdata.Transactions (Username, "
+                            + "AccountName, Amount, TransactionType, CurrencyType, "
+                            + "Category, TransactionDate, TransactionTime)"
+                            + " values (?, ?, ?, ?, ?, ?, ?, ?)");
+            query.setString(1, username);
+            query.setString(2, accountName);
+            query.setDouble(3, amount);
+            query.setString(4, transactionType);
+            query.setString(5, currencyType);
+            query.setString(6, category);
+            query.setString(7, transactionDate);
+            query.setString(8, transactionTime);
+            query.executeUpdate();
+            System.out.println("Passed execute update");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (transactionType.equals("Withdrawal")) {
             amount = -amount;
         }
@@ -301,7 +302,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // Add a way to account for currencyType when updating balance
         createStatementForConnection();
         try {
-            String selectQuery = "SELECT Balance FROM test.Accounts "
+            String selectQuery = "SELECT Balance FROM cb_buckdata.Accounts "
                     + " WHERE Username = '" + username
                     + "' AND AccountName = '" + accountName + "'";
             ResultSet aResultSet = statement.executeQuery(selectQuery);
@@ -490,6 +491,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         }
         return transList;
     }
+
     /**
      * Rolls back a transaction from the database and updates the account's
      * balance to reflect that change
