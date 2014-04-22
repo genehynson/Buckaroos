@@ -40,6 +40,7 @@ public class CreateAccount extends Composite {
 		title = new Label();
 		title.setText("Create New Account");
 		title.addStyleName("white-text");
+		title.addStyleName("title");
 		selectCurrency = new Label();
 		selectCurrency.setText("Select Currency:");
 		selectCurrency.addStyleName("white-text");

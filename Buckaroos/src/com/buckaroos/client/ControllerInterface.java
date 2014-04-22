@@ -135,24 +135,6 @@ public interface ControllerInterface {
      */
     public abstract void generateCashFlowReport();
 
-    /**
-     * Generates an account listing report. Shows all the accounts for the user
-     * with their current balance. Should have to option to go to the
-     * transaction history for that account and rollback or commit a previously
-     * rollbacked transaction.
-     * 
-     * @return The list of all user's accounts.
-     */
-    public abstract void generateAccountListingReport();
-
-    /**
-     * Generates a transaction history report for an specific account. For any
-     * given account, you should be able to view all the transactions over a
-     * given time period that have affected the balance of that account.
-     * 
-     * @return The transaction list report.
-     */
-    public abstract void generateTransactionHistoryReport();
 
     /**
      * Confirms the login credentials for an user.
@@ -224,5 +206,8 @@ public interface ControllerInterface {
 	public abstract void updateUser(String username, String password, String email);
 	
 	public abstract List<String> getCurrencySymbols();
+	
+	public abstract List<String> getCurrencyAbrev();
+
 
 }

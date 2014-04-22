@@ -40,8 +40,9 @@ public class ChangeAccount extends Composite {
     private Panel vPanel, hPanel;
     
     
-	public ChangeAccount(List<Account> userAccounts) {
+	public ChangeAccount(List<Account> listUserAccounts) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.userAccounts = listUserAccounts;
 		createAccount = new Button();
 		createAccount.setText("Create New Account");
 		createAccount.addStyleName("blue-button");
@@ -73,7 +74,8 @@ public class ChangeAccount extends Composite {
 			}
 		});
 		title = new Label();
-		title.setText("Select Another Account");
+		title.setText("Select an Account");
+		title.addStyleName("title");
 		controller = new UserAccountController();
 		table = new FlexTable();
 		vPanel = new VerticalPanel();

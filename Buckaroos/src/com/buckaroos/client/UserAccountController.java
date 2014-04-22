@@ -189,6 +189,7 @@ public class UserAccountController implements ControllerInterface {
 //                }
 //                newUser = new User(accountName, sb.toString(), email);
     		user = newUser;
+			registerUser = true;
     		db.addUser(newUser, callbackUser);
 //            } catch (NoSuchAlgorithmException e1) {
 //                // Do Nothing
@@ -434,6 +435,26 @@ public class UserAccountController implements ControllerInterface {
     	currencies.add(currency.getSymbolOfCurrency(Money.BDT));
     	return currencies;
     }
+    
+    @Override
+    public List<String> getCurrencyAbrev() {
+    	currencies = new ArrayList<String>();
+    	currencies.add(Money.USD.toString());
+    	currencies.add(Money.EUR.toString());
+    	currencies.add(Money.GBP.toString());
+    	currencies.add(Money.CAD.toString());
+    	currencies.add(Money.AUD.toString());
+    	currencies.add(Money.JPY.toString());
+    	currencies.add(Money.INR.toString());
+    	currencies.add(Money.CHF.toString());
+    	currencies.add(Money.RUB.toString());
+    	currencies.add(Money.BRL.toString());
+    	currencies.add(Money.MXN.toString());
+    	currencies.add(Money.CNY.toString());
+    	currencies.add(Money.AED.toString());
+    	currencies.add(Money.BDT.toString());
+    	return currencies;
+    }
 
 //==========================
     //generate things
@@ -441,6 +462,7 @@ public class UserAccountController implements ControllerInterface {
 
     @Override
     public void generateSpendingCategoryReport() {
+		changeDates = true;
     	db.getSpendingCategoryInfo(user.getUsername(),
     			currentAccount.getName(), beginDate,
     			endDate, callbackHashMap);
@@ -448,22 +470,12 @@ public class UserAccountController implements ControllerInterface {
     
     @Override
     public void generateIncomeSourceReport() {
-    	// TODO Auto-generated method stub
+    	changeDates = true;
+    	db.getIncomeSourceInfo(user.getUsername(), currentAccount.getName(), beginDate, endDate, callbackHashMap);
     }
     
     @Override
     public void generateCashFlowReport() {
-    	// TODO Auto-generated method stub
-    }
-    
-    @Override
-    public void generateAccountListingReport() {
-    	// TODO Auto-generated method stub
-    }
-    
-    @Override
-    public void generateTransactionHistoryReport() {
-    	// TODO Auto-generated method stub
     }
     
     @Override
@@ -475,7 +487,7 @@ public class UserAccountController implements ControllerInterface {
     @Override
     public void welcomeEmail(String username) {
     	sendingWelcomeEmail = true;
-    	db.getUser(username, callbackUser);
+		db.sendWelcomeEmail(user.getEmail(), user.getEmail(), callbackVoid);
     }
 
 //===========================
@@ -506,7 +518,7 @@ public class UserAccountController implements ControllerInterface {
 				createReports = false;
 			} else if (loginUser) {
 				user = (User) result;
-				if (isPasswordCorrect(user.getUsername(), aPassword, user.getPassword())) {
+				if (result != null && isPasswordCorrect(user.getUsername(), aPassword, user.getPassword())) {
 					RootPanel.get("page").clear();
 					createChangeAccount();
 				} else {
@@ -515,7 +527,7 @@ public class UserAccountController implements ControllerInterface {
 				loginUser = false;
 			} else if (registerUser) {
 				RootPanel.get("page").clear();
-				createCreateAccount();
+				welcomeEmail(user.getUsername());
 				registerUser = false;
 			} else if (updateCurrentUser) {
 				user = (User) result;
@@ -527,15 +539,14 @@ public class UserAccountController implements ControllerInterface {
 				createAccountOverview = true;
 			} else if (doesLoginAccountExist) {
 				if (result == null) {
-					registerUser = true;
 					storeAccount(aUsername, aPassword, aEmail);
-					welcomeEmail(user.getUsername());
 				} else {
 					register.displayAccountAlreadyExists();
 				}
 				doesLoginAccountExist = false;
 			} else if (createCreateAccount) {
 				userAccounts = (List<Account>) result;
+				createAccount = new CreateAccount();
 				createCreateAccount = false;
 			} else if (addAccount) {
 				if (doesAccountExist(currentAccount.getName())) {
@@ -550,7 +561,9 @@ public class UserAccountController implements ControllerInterface {
 				createAccountOverview();
 				addTransaction = false;
 			} else if (changeDates) {
+				reportTransactions = new HashMap<String, Double>();
 				reportTransactions = (Map<String, Double>) result;
+				reportTransactionNames = new ArrayList<String>();
 				reportTransactionNames.addAll(reportTransactions.keySet());
 				System.out.println(reportTransactions.get("food"));
 				System.out.println(reportTransactions.size());
@@ -577,8 +590,7 @@ public class UserAccountController implements ControllerInterface {
 				updateUser = false;
 				//do nothing
 			} else if (sendingWelcomeEmail) {
-				user = (User) result;
-				db.sendWelcomeEmail(user.getEmail(), user.getEmail(), callbackVoid);
+				createCreateAccount();
 				sendingWelcomeEmail = false;
 			} else if (result == null) {
 				System.out.println("Result is currently null");
@@ -613,7 +625,6 @@ public class UserAccountController implements ControllerInterface {
 	public void createCreateAccount() {
 		createCreateAccount = true;
 		db.getAllAccounts(user.getUsername(), callbackListAccounts);
-		createAccount = new CreateAccount();
 	}
 	
 	public void loginUser(String accountName, String password) {
@@ -631,7 +642,6 @@ public class UserAccountController implements ControllerInterface {
 	}
 	
 	public void changeDates(String beforeDate, String afterDate) {
-		changeDates = true;
 		beginDate = beforeDate;
 		endDate = afterDate;
 		generateSpendingCategoryReport();

@@ -1,12 +1,9 @@
 package com.buckaroos.client;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.buckaroos.server.AccountTransaction;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -23,11 +20,11 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DatePicker;
 
 public class Reports extends Composite {
 
@@ -39,9 +36,10 @@ public class Reports extends Composite {
 	Label title;
 	Label dash;
 	DateBox fromDate, toDate;
+	RadioButton spendingReport, cashFlow, incomeReport;
 	
     private ControllerInterface controller;
-    private Panel vPanel, hPanel;
+    private Panel vPanel, hPanel, radioButtonPanel;
     private String beginDate, afterDate;
     private Map<String, Double> categoryTotals;
     private List<String> categoryNames;
@@ -64,10 +62,43 @@ public class Reports extends Composite {
     	title = new Label();
     	title.setText("Reports");
     	title.addStyleName("white-text");
+    	title.addStyleName("title");
     	dash = new Label();
     	dash.addStyleName("white-text");
+    	
+    	spendingReport = new RadioButton("type");
+    	spendingReport.setText("Spending Report");
+    	spendingReport.addStyleName("white-text");
+    	spendingReport.setValue(true);
+    	spendingReport.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controller.generateSpendingCategoryReport();
+			}
+		});
+    	cashFlow = new RadioButton("type");
+    	cashFlow.setText("Cash Flow Report");
+    	cashFlow.addStyleName("white-text");
+    	cashFlow.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controller.generateCashFlowReport();
+			}
+		});
+    	incomeReport = new RadioButton("type");
+    	incomeReport.setText("Income Source Report");
+    	incomeReport.addStyleName("white-text");
+    	incomeReport.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controller.generateIncomeSourceReport();
+			}
+		});
+    	
     	beginDate = "Select date";
     	afterDate = "Select date";
+    	toDate.getTextBox().setText(afterDate);
+    	fromDate.getTextBox().setText(beginDate);
     	dash.setText(" - ");
     	fromDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
     		public void onValueChange(ValueChangeEvent<Date> event) {
@@ -77,6 +108,9 @@ public class Reports extends Composite {
     	    	DateTimeFormat df = new DateTimeFormat(pattern, info) {};  // <= trick here
     	        beginDate = df.format(date);
     	    	fromDate.getTextBox().setText(beginDate);
+    	    	if (toDate.getTextBox().getText().equals("Select date")) {
+    	    		toDate.getTextBox().setText("today");
+    	    	}
     	    	controller.changeDates(beginDate, afterDate);
     	    	System.out.println(beginDate);
     		}
@@ -89,11 +123,15 @@ public class Reports extends Composite {
     	    	DateTimeFormat df = new DateTimeFormat(pattern, info) {};  // <= trick here
     	        afterDate = df.format(date);
     	    	toDate.getTextBox().setText(afterDate);
+    	    	if (fromDate.getTextBox().getText().equals("Select date")) {
+    	    		fromDate.getTextBox().setText("today");
+    	    	}
     	    	controller.changeDates(beginDate, afterDate);
     		}
     	});
     	menu = new Button();
     	menu.setText("Account Overview");
+    	menu.addStyleName("blue-button");
 		menu.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -101,15 +139,21 @@ public class Reports extends Composite {
 				controller.createAccountOverview();
 			}
 		});
-		table = new FlexTable();
-		table.addStyleName("white-text");
+
 		buildTable();
+		
+		radioButtonPanel = new VerticalPanel();
+		radioButtonPanel.add(spendingReport);
+		radioButtonPanel.add(cashFlow);
+		radioButtonPanel.add(incomeReport);
+		
 		hPanel = new HorizontalPanel();
 		hPanel.add(fromDate);
 		hPanel.add(dash);
 		hPanel.add(toDate);
 		vPanel = new VerticalPanel();
 		vPanel.add(title);
+		vPanel.add(radioButtonPanel);
 		vPanel.add(hPanel);
 		vPanel.add(table);
 		vPanel.add(menu);
@@ -119,22 +163,29 @@ public class Reports extends Composite {
     private void buildTable() {
 		String name = "";
 		String total = "";
-		NumberFormat us = NumberFormat.getCurrencyFormat();
+		table = new FlexTable();
+		table.addStyleName("white-text");
 		for (int i = 0; i < categoryNames.size(); i++) {
 			name = categoryNames.get(i);
-			total = us.format(categoryTotals.get(name));
 			table.setText(i,0, name);
 			table.setText(i,1, "Total: " + total);
 			table.getCellFormatter().addStyleName(i, 0, "table-styling");
 			table.getCellFormatter().addStyleName(i, 1, "table-styling");
 		}
 		RootPanel.get("page").clear();
-		hPanel = new HorizontalPanel();
+		
+		radioButtonPanel = new HorizontalPanel();
+		radioButtonPanel.add(spendingReport);
+		radioButtonPanel.add(cashFlow);
+		radioButtonPanel.add(incomeReport);
+		
+		hPanel = new VerticalPanel();
 		hPanel.add(fromDate);
 		hPanel.add(dash);
 		hPanel.add(toDate);
 		vPanel = new VerticalPanel();
 		vPanel.add(title);
+		vPanel.add(radioButtonPanel);
 		vPanel.add(hPanel);
 		vPanel.add(table);
 		vPanel.add(menu);

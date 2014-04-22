@@ -39,7 +39,7 @@ public class Transaction extends Composite {
 	
 	private ControllerInterface controller;
     private int hour, minute;
-    private Panel vPanel, timePanel, radioPanel, buttonPanel, amountPanel;
+    private Panel vPanel, timePanel, radioPanel, buttonPanel, amountPanel, currencyLabelPanel;
 	private List<String> currencies;
 
 	
@@ -54,7 +54,7 @@ public class Transaction extends Composite {
     	hourBox = new ListBox();
     	minuteBox = new ListBox();
     	currencyBox = new ListBox();
-		currencies = controller.getCurrencySymbols();
+		currencies = controller.getCurrencyAbrev();
 		for (String currency : currencies) {
 			currencyBox.addItem(currency);
 		}
@@ -65,6 +65,7 @@ public class Transaction extends Composite {
     	title = new Label();
     	title.setText("Add New Transaction");
     	title.addStyleName("white-text");
+    	title.addStyleName("title");
     	date = new Label();
     	date.setText("Select Date:");
     	date.addStyleName("white-text");
@@ -147,13 +148,18 @@ public class Transaction extends Composite {
 		timePanel.add(minutes);
 		timePanel.add(minuteBox);
 		
+		currencyLabelPanel = new HorizontalPanel();
+		currencyLabelPanel.add(amountTitle);
+		currencyLabelPanel.add(selectCurrency);
+		
+		amountPanel = new HorizontalPanel();
+//		amountPanel.add(dollar);
+		amountPanel.add(amount);
+		amountPanel.add(currencyBox);
+
 		buttonPanel = new HorizontalPanel();
 		buttonPanel.add(save);
 		buttonPanel.add(back);
-		
-		amountPanel = new HorizontalPanel();
-		amountPanel.add(dollar);
-		amountPanel.add(amount);
 		
 		vPanel = new VerticalPanel();
 		vPanel.add(title);
@@ -162,10 +168,8 @@ public class Transaction extends Composite {
 		vPanel.add(timePanel);
 		vPanel.add(date);
 		vPanel.add(datePicker);
-		vPanel.add(amountTitle);
+		vPanel.add(currencyLabelPanel);
 		vPanel.add(amountPanel);
-		vPanel.add(selectCurrency);
-		vPanel.add(currencyBox);
 		vPanel.add(categoryTitle);
 		vPanel.add(category);
 		vPanel.add(buttonPanel);

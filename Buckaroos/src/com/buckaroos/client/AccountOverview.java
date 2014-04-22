@@ -27,7 +27,7 @@ public class AccountOverview extends Composite {
 	interface AccountOverviewUiBinder extends UiBinder<Widget, AccountOverview> {
 	}
 	@UiField
-	Label accountName, title;
+	Label accountName, title, accountBalanceInfo;
 	Button menu, report, addTransaction, edit, delete, deleteAccount;
 	FlexTable table;
 	
@@ -42,8 +42,12 @@ public class AccountOverview extends Composite {
 		transactions = theTransactions;
 		accountName = new Label();
 		accountName.addStyleName("white-text");
+		accountBalanceInfo = new Label();
+		accountBalanceInfo.addStyleName("white-text");
+		accountBalanceInfo.setText("Account: " + controller.getCurrentAccount().getName() + ". Balance: $" + controller.getCurrentAccount().getBalance());
 		title = new Label();
-		title.setText("Account Overview for account: " + controller.getCurrentAccount().getName() + ". Balance: $" + controller.getCurrentAccount().getBalance());
+		title.setText("Account Overview");
+		title.addStyleName("title");
 		title.addStyleName("white-text");
 		menu = new Button();
 		menu.setText("Select Account");
@@ -152,6 +156,7 @@ public class AccountOverview extends Composite {
 		hPanel.add(addTransaction);
 		hPanel.add(deleteAccount);
 		vPanel.add(title);
+		vPanel.add(accountBalanceInfo);
 		vPanel.add(table);
 		vPanel.add(hPanel);
 		RootPanel.get("page").add(vPanel);

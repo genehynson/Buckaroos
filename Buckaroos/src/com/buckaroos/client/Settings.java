@@ -76,7 +76,7 @@ public class Settings extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				RootPanel.get("page").clear();
-				WelcomeScreen ws = new WelcomeScreen();
+				controller.createChangeAccount();
 			}
 		});
 		hPanel = new HorizontalPanel();

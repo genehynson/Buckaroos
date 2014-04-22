@@ -3,6 +3,7 @@ package com.buckaroos.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -26,14 +27,23 @@ public class Login extends Composite {
 
 	@UiField
 	TextBox etUser, etPass;
-	Button bLogin, back;
+	Button bLogin, back, sendEmail;
 	Label title, username, password, subtitle1, subtitle2, passwordReset;
 
 	private Panel vPanel, hPanel;
     private ControllerInterface controller = new UserAccountController();
+    private Audio sound;
     
 	public Login() {
 		initWidget(uiBinder.createAndBindUi(this));
+		buildLogin();
+	}
+	
+	public void displayNotCorrect() {
+		Window.alert("Invalid login info.");
+	}
+	
+	private void buildLogin() {
 		title = new Label();
 		title.setText("buckaroos");
 		passwordReset = new Label("Forgot Password");
@@ -41,7 +51,7 @@ public class Login extends Composite {
 		passwordReset.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				controller.resetPassword(etUser.getText());
+				buildForgotPassword();
 			}
 		});
 		subtitle1 = new Label();
@@ -68,12 +78,21 @@ public class Login extends Composite {
 		password.addStyleName("white-text");
 		etUser = new TextBox();
 		etUser.setText("Enter your login");
+		etUser.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				etUser.setText("");
+			}
+		});
 		etPass = new PasswordTextBox();
 		vPanel = new VerticalPanel();
 		bLogin.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				controller.loginUser(etUser.getText(), etPass.getText());
+				sound = Audio.createIfSupported();
+				sound.setSrc("sounds/click.mp3");
+				sound.play();
 			}
 		});
 		back.addClickHandler(new ClickHandler() {
@@ -100,9 +119,40 @@ public class Login extends Composite {
         RootPanel.get("page").clear();
 		RootPanel.get("page").add(vPanel);
 	}
-	
-	public void displayNotCorrect() {
-		Window.alert("Invalid login info.");
+	private void buildForgotPassword() {
+		sendEmail = new Button("Send Email");
+		sendEmail.addStyleName("blue-button");
+		back = new Button("Back");
+		back.addStyleName("blue-button");
+		back.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				buildLogin();
+			}
+		});
+		sendEmail.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controller.resetPassword(etUser.getText());
+				buildLogin();
+			}
+		});
+		subtitle1.setText("Enter your username and click 'Send Email'");
+		hPanel = new HorizontalPanel();
+		vPanel = new VerticalPanel();
+		hPanel.add(sendEmail);
+		hPanel.add(back);
+		vPanel.add(title);
+		vPanel.add(subtitle1);
+		vPanel.add(username);
+		vPanel.add(etUser);
+		vPanel.add(hPanel);
+		vPanel.add(subtitle2);
+        RootPanel.get("page").clear();
+		RootPanel.get("page").add(vPanel);
+		
+
+		
 	}
 }
 

@@ -7,6 +7,7 @@
 	<g:HTMLPanel>
 	    <g:Label ui:field="title" />
 	    <g:Label ui:field="accountName" />
+	    <g:Label ui:field="accountBalanceInfo" />
 	    <g:Button ui:field="menu" />
 	    <g:Button ui:field="addTransaction" />
 	    <g:Button ui:field="report" />

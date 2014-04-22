@@ -71,7 +71,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
 //        connect = DriverManager
 //              .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=&password=buckaroos101");
         connect = DriverManager
-                .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=bf0998d04fdec5&password=acf6b561");
+                .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/cb_buckdata?user=bf0998d04fdec5&password=acf6b561");
 
     }
 
@@ -101,9 +101,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     public void addUser(User user) {
         // Will have to change test to whatever the name of the DB is that is
         // hosted by Deloitte
+        createStatementForConnection();
         try {
             query = connect
-                    .prepareStatement("insert into cb_buckdata.Credentials "
+                    .prepareStatement("insert into Credentials "
                             + "values (?, ?, ?)");
             query.setString(1, user.getUsername());
             query.setString(2, user.getPassword());
@@ -176,9 +177,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
      *             and accountName passed in already exists
      */
     public void addAccount(String username, Account account) {
+        createStatementForConnection();
         try {
             query = connect
-                    .prepareStatement("insert into cb_buckdata.Accounts (Username, "
+                    .prepareStatement("insert into Accounts (Username, "
                             + "AccountName, Balance, InterestRate, AccountNickName)"
                             + " values (?, ?, ?, ?, ?)");
             query.setString(1, username);
@@ -248,7 +250,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
                 accList.add(foundAccount);
             }
         } catch (SQLException e) {
-            System.out.println("Account not found");
+            System.out.println("Accounts not found");
             e.printStackTrace();
         }
         return accList;
@@ -271,9 +273,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     public void addTransaction(String username, String accountName,
             double amount, String transactionType, String currencyType,
             String category, String transactionDate, String transactionTime) {
+        createStatementForConnection();
         try {
             query = connect
-                    .prepareStatement("insert into cb_buckdata.Transactions (Username, "
+                    .prepareStatement("insert into Transactions (Username, "
                             + "AccountName, Amount, TransactionType, CurrencyType, "
                             + "Category, TransactionDate, TransactionTime)"
                             + " values (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -308,7 +311,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // Add a way to account for currencyType when updating balance
         createStatementForConnection();
         try {
-            String selectQuery = "SELECT Balance FROM cb_buckdata.Accounts "
+            String selectQuery = "SELECT Balance FROM Accounts "
                     + " WHERE Username = '" + username
                     + "' AND AccountName = '" + accountName + "'";
             ResultSet aResultSet = statement.executeQuery(selectQuery);
