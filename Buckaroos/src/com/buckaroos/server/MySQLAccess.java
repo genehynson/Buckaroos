@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -66,10 +67,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // connect = DriverManager
         // .getConnection("jdbc:mysql://localhost:3306/test"
         // + "?user=root&password=buckaroos");
-//        connect = DriverManager
-//                .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/cb_buckdata?user=bf0998d04fdec5&password=acf6b561");
-//        connect = DriverManager
-//              .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=&password=buckaroos101");
+        // connect = DriverManager
+        // .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/cb_buckdata?user=bf0998d04fdec5&password=acf6b561");
+        // connect = DriverManager
+        // .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/buckdata?user=&password=buckaroos101");
         connect = DriverManager
                 .getConnection("jdbc:mysql://us-cdbr-cb-east-01.cleardb.net:3306/cb_buckdata?user=bf0998d04fdec5&password=acf6b561");
 
@@ -103,16 +104,15 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // hosted by Deloitte
         createStatementForConnection();
         try {
-            query = connect
-                    .prepareStatement("insert into Credentials "
-                            + "values (?, ?, ?)");
+            query = connect.prepareStatement("insert into Credentials "
+                    + "values (?, ?, ?)");
             query.setString(1, user.getUsername());
             query.setString(2, user.getPassword());
             query.setString(3, user.getEmail());
             query.executeUpdate();
             System.out.println("hello?");
         } catch (SQLException e) {
-        	System.out.println("Exception caught when adding user.");
+            System.out.println("Exception caught when adding user.");
             e.printStackTrace();
         }
     }
@@ -179,10 +179,9 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     public void addAccount(String username, Account account) {
         createStatementForConnection();
         try {
-            query = connect
-                    .prepareStatement("insert into Accounts (Username, "
-                            + "AccountName, Balance, InterestRate, AccountNickName)"
-                            + " values (?, ?, ?, ?, ?)");
+            query = connect.prepareStatement("insert into Accounts (Username, "
+                    + "AccountName, Balance, InterestRate, AccountNickName)"
+                    + " values (?, ?, ?, ?, ?)");
             query.setString(1, username);
             query.setString(2, account.getName());
             query.setDouble(3, account.getBalance());
@@ -191,6 +190,27 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             query.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Deletes an account from the database
+     * 
+     * @param username The username with which the account is associated
+     * @param accountName The name of the account to be deleted
+     * @throws SQLException Throws an exception if no such transaction exists
+     */
+    public void deleteAccount(String username, String accountName) {
+        Account theAccount = getAccount(username, accountName);
+        if (theAccount != null) {
+            String updateQuery = "DELETE FROM Accounts " + "WHERE Username = '"
+                    + username + "' AND AccountName = '" + accountName + "'";
+            try {
+                query = connect.prepareStatement(updateQuery);
+                query.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -405,6 +425,100 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     }
 
     /**
+     * Gets a Map containing information about the cash flow of the user's
+     * accounts.
+     * 
+     * @param username The username for which the cash flow report is to be
+     *            generated
+     * @param startDate The start date of the transactions to include in the
+     *            report
+     * @param endDate The end date of the transactions to include in the report
+     * @return A map containing information required to generate a cash flow
+     *         report
+     */
+    public Map<String, Double> getCashFlowReportInfo(String username,
+            String startDate, String endDate) {
+        List<Account> accList = getAllAccounts(username);
+        Map<String, Double> cashFlowMap = new HashMap<String, Double>();
+        double expenseAmount = 0;
+        double incomeAmount = 0;
+        for (Account acc : accList) {
+            Map<String, Double> expenses = getSpendingCategoryInfo(username,
+                    acc.getName(), startDate, endDate);
+            Map<String, Double> income = getIncomeSourceInfo(username,
+                    acc.getName(), startDate, endDate);
+            for (double a : expenses.values()) {
+                expenseAmount += a;
+            }
+            for (double b : income.values()) {
+                incomeAmount += b;
+            }
+        }
+        cashFlowMap.put("Expenses", expenseAmount);
+        cashFlowMap.put("Income", incomeAmount);
+        cashFlowMap.put("Flow", incomeAmount - expenseAmount);
+        return cashFlowMap;
+    }
+
+    /**
+     * Gets the information required to generate the account listing reports.
+     * 
+     * @param username The username for which the account listing reports are to
+     *            be retrieved.
+     * @return A map containing each account name associated with the username
+     *         and its balance.
+     */
+    public Map<String, Double> getAccountListingReportInfo(String username) {
+        List<Account> accList = getAllAccounts(username);
+        Map<String, Double> accountListingMap = new HashMap<String, Double>();
+        for (Account acc : accList) {
+            accountListingMap.put(acc.getName(), acc.getBalance());
+        }
+        return accountListingMap;
+    }
+
+    /**
+     * Retrieves all transactions from the database associated with the
+     * combination of username and accountName passed in. It then stores the
+     * rolled back transactions and committed transactions in separate lists and
+     * puts them in the map if they contain transactions.
+     * 
+     * @param username The username with which the transactions are associated
+     * @param accountName The accountName with which the transactions are
+     *            associated
+     * @param startDate The start date to include in the search
+     * @param endDate The end date to include in the search
+     * @return A map containing the committed and rolled back transactions in
+     *         lists
+     */
+    public Map<String, List<AccountTransaction>> getTransactionHistoryInfo(
+            String username, String accountName, String startDate,
+            String endDate) {
+        Map<String, List<AccountTransaction>> transHistory = new HashMap<>();
+        List<AccountTransaction> allTransactions = getAllTransactions(username,
+                accountName);
+        List<AccountTransaction> committed = new ArrayList<>();
+        List<AccountTransaction> rolledBack = new ArrayList<>();
+        for (AccountTransaction a : allTransactions) {
+            if (endDate.compareTo(a.getDate()) >= 0
+                    && startDate.compareTo(a.getDate()) <= 0) {
+                if (!a.isRolledBack()) {
+                    committed.add(a);
+                } else {
+                    rolledBack.add(a);
+                }
+            }
+        }
+        if (!committed.isEmpty()) {
+            transHistory.put("Committed", committed);
+        }
+        if (!rolledBack.isEmpty()) {
+            transHistory.put("RolledBack", rolledBack);
+        }
+        return transHistory;
+    }
+
+    /**
      * Retrieves a transaction from the database
      * 
      * @param username The username for whom the transaction is being retrieved
@@ -453,6 +567,30 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             e.printStackTrace();
         }
         return returnTransaction;
+    }
+
+    /**
+     * Retrieves the current transactions associated with a particular user and
+     * account.
+     * 
+     * @param username The username for which the transactions are being
+     *            retrieved
+     * @param accountName The accountName with which the transactions are
+     *            associated
+     * @return A List containing the current transactions in the database
+     *         associated with the passed in username and accountName
+     */
+    public List<AccountTransaction> getCurrentTransactions(String username,
+            String accountName) {
+        List<AccountTransaction> currTransactions = new ArrayList<>();
+        List<AccountTransaction> allTransactions = getAllTransactions(username,
+                accountName);
+        for (AccountTransaction a : allTransactions) {
+            if (!a.isRolledBack()) {
+                currTransactions.add(a);
+            }
+        }
+        return currTransactions;
     }
 
     /**
@@ -587,10 +725,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             }
             String updateQuery = "DELETE FROM Transactions "
                     + "WHERE Username = '" + username + "' AND AccountName = '"
-                    + accountName + "' AND Amount = '" + amountToModify
-                    + "' AND " + "Category = '" + category
-                    + "' AND TransactionDate = '" + transactionDate
-                    + "' AND TransactionTime = '" + transactionTime + "'";
+                    + accountName + "' AND Amount = '" + amount + "' AND "
+                    + "Category = '" + category + "' AND TransactionDate = '"
+                    + transactionDate + "' AND TransactionTime = '"
+                    + transactionTime + "'";
             try {
                 query = connect.prepareStatement(updateQuery);
                 query.executeUpdate();
