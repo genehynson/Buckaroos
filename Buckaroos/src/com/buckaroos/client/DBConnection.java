@@ -51,4 +51,6 @@ public interface DBConnection extends RemoteService {
 	
 	HashMap<String, Double> getCashFlowReportInfo(String username,
             String startDate, String endDate);
+	
+	void deleteAccount(String username, String accountName);
 }

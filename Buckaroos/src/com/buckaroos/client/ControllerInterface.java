@@ -209,5 +209,6 @@ public interface ControllerInterface {
 	
 	public abstract List<String> getCurrencyAbrev();
 
+	public abstract void deleteAccount();
 
 }

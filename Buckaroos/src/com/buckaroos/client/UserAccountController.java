@@ -82,6 +82,7 @@ public class UserAccountController implements ControllerInterface {
     private boolean sendingWelcomeEmail = false;
     private boolean updateUser = false;
     private boolean updateCurrentAccount = false;
+    private boolean deleteAccount = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -580,6 +581,9 @@ public class UserAccountController implements ControllerInterface {
 				RootPanel.get("page").clear();
 				createAccountOverview();
 				deleteTransaction = false;
+			} else if (deleteAccount) {
+				RootPanel.get("page").clear();
+				createChangeAccount();
 			} else if (sendingResetPasswordEmail) {
 				user = (User) result;
 				if (user != null) {
@@ -665,6 +669,11 @@ public class UserAccountController implements ControllerInterface {
 	public void deleteTransaction(AccountTransaction t) {
 		deleteTransaction = true;
 		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
+	}
+	
+	public void deleteAccount() {
+		deleteAccount = true;
+		db.addAccount(user.getUsername(), currentAccount, callbackVoid);
 	}
 	
 }

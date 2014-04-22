@@ -83,10 +83,7 @@ public class AccountOverview extends Composite {
 		deleteAccount.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("page").clear();
-				controller.createChangeAccount();
-				
-				//TODO: actually delete the account
-				
+				controller.deleteAccount();
 			}
 		});
 		delete.addClickHandler(new ClickHandler() {

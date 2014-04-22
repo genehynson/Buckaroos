@@ -48,6 +48,7 @@ public interface DBConnectionAsync {
             String username, List<AccountTransaction> transactions, AsyncCallback callback);
 	void getCashFlowReportInfo(String username,
             String startDate, String endDate, AsyncCallback<HashMap<String, Double>> callback);
+	void deleteAccount(String username, String accountName, AsyncCallback callback);
 	
 	
 }
