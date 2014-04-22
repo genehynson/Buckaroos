@@ -70,6 +70,7 @@ body {
   background-color: #1c1c1c;
   background-image: url("../images/tiles.jpg");
   border-radius: 4px;
+  border-color: #646B74;
   margin: 4px;
 }
 .tile-button:hover,
@@ -251,16 +252,24 @@ fieldset[disabled] .btn-glass.active {
 
 /* better navbar */
 .navbar-glassbar {
+  /*
   background-color: rgba(11,11,11,0.3);
   background: linear-gradient(transparent, rgba(256,256,256,0.1), transparent);
-  border-color: #080808;
+  border-color: rgba(256,256,256,0.5);
+  */
+  background: linear-gradient(0deg, transparent, rgba(256,256,256,0.2), transparent);
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(256,256,256,0.5);
+  border-left: none;
+  border-right: none;
 }
 .navbar-glassbar .navbar-brand {
     font-family: 'facebook_letter_facesregular';
     font-size: 250%;
     color: #ffffff;
 }
-/*makes navbar-brand unclickable*/
+/*makes navbar-brand clickable*/
 /*
 .navbar-glassbar .navbar-brand:hover,
 .navbar-glassbar .navbar-brand:focus {

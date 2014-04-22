@@ -1,2 +1,0 @@
-serviceClass: com.buckaroos.client.DBConnection
-path: 566154A2544BFE5BC78F3FAF60069C12.gwt.rpc
