@@ -22,6 +22,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.buckaroos.client.DBConnection;
+import com.buckaroos.utility.PasswordHash;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 //Download mysql server from here: http://dev.mysql.com/downloads/mysql/
@@ -46,6 +47,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     private Connection connect = null;
     private Statement statement = null;
     private PreparedStatement query = null;
+    private PasswordHash hasher = new PasswordHash();
 
     /**
      * This connects the application with the database through a JDBC Driver
@@ -104,10 +106,12 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
         // hosted by Deloitte
         createStatementForConnection();
         try {
+            String userPassword = user.getPassword();
+            String hashedPassword = hasher.hashPassword(userPassword);
             query = connect.prepareStatement("insert into Credentials "
                     + "values (?, ?, ?)");
             query.setString(1, user.getUsername());
-            query.setString(2, user.getPassword());
+            query.setString(2, hashedPassword);
             query.setString(3, user.getEmail());
             query.executeUpdate();
             System.out.println("hello?");
@@ -116,6 +120,23 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             e.printStackTrace();
         }
         return getUser(user.getUsername());
+    }
+
+    /**
+     * Checks to see if the password the user entered was correct
+     * 
+     * @param username The username of the user
+     * @param enteredPassword The password the user entered
+     * @return True if the password is correct, false otherwise
+     */
+    public boolean isPasswordCorrect(String username, String enteredPassword) {
+        boolean isPasswordCorrect = false;
+        String hashOfEnteredPassword = hasher.hashPassword(enteredPassword);
+        User userToCheck = getUser(username);
+        if (userToCheck.getPassword().equals(hashOfEnteredPassword)) {
+            isPasswordCorrect = true;
+        }
+        return isPasswordCorrect;
     }
 
     /**
