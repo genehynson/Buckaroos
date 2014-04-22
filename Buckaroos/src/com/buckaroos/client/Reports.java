@@ -167,6 +167,7 @@ public class Reports extends Composite {
 		table.addStyleName("white-text");
 		for (int i = 0; i < categoryNames.size(); i++) {
 			name = categoryNames.get(i);
+			total = categoryTotals.get(name).toString();
 			table.setText(i,0, name);
 			table.setText(i,1, "Total: " + total);
 			table.getCellFormatter().addStyleName(i, 0, "table-styling");
@@ -174,7 +175,7 @@ public class Reports extends Composite {
 		}
 		RootPanel.get("page").clear();
 		
-		radioButtonPanel = new HorizontalPanel();
+		radioButtonPanel = new VerticalPanel();
 		radioButtonPanel.add(spendingReport);
 		radioButtonPanel.add(cashFlow);
 		radioButtonPanel.add(incomeReport);
