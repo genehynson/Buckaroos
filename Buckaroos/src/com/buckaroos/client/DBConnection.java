@@ -8,6 +8,7 @@ import java.util.Map;
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
 import com.buckaroos.server.User;
+import com.buckaroos.utility.Money;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -75,4 +76,9 @@ public interface DBConnection extends RemoteService {
 
     List<AccountTransaction> getCurrentTransactions(String username,
             String accountName);
+
+    void setUpForCurrencyConversion();
+
+    double convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
+            double amount);
 }
