@@ -1,6 +1,5 @@
 package com.buckaroos.client;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +9,8 @@ import java.util.Map;
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
 import com.buckaroos.server.User;
+import com.buckaroos.utility.CurrencyConverter;
+import com.buckaroos.utility.CurrencyConverterInterface;
 import com.buckaroos.utility.CurrencyInformationProvider;
 import com.buckaroos.utility.Money;
 import com.google.gwt.core.client.GWT;
@@ -154,6 +155,7 @@ public class UserAccountController implements ControllerInterface {
             String category, Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
+        amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Withdrawal", currencyType, category, dateString, timeString, callbackTransaction);
@@ -164,9 +166,18 @@ public class UserAccountController implements ControllerInterface {
             Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
+        amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Deposit", currencyType, category, dateString, timeString, callbackTransaction);
+    }
+    
+    private double checkCurrency(double amount, String currencyType) {
+    	if (currencyType != "USD") {
+    		CurrencyConverterInterface convert = new CurrencyConverter();
+    		amount = convert.convertCurrency(Money.valueOf(currencyType), Money.USD, amount);
+    	}
+    	return amount;
     }
     
     /**
