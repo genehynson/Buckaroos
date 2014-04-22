@@ -244,105 +244,105 @@ fieldset[disabled] .btn-glass.active {
   background-color: #ffffff;
 }
 
-
-
-
 .faceletters{
     font-family: 'facebook_letter_facesregular';
     font-size: 400%;
 }
 
 /* better navbar */
-.navbar-greenverse {
+.navbar-glassbar {
   background-color: rgba(11,11,11,0.3);
   background: linear-gradient(transparent, rgba(256,256,256,0.1), transparent);
   border-color: #080808;
 }
-.navbar-greenverse .navbar-brand {
+.navbar-glassbar .navbar-brand {
     font-family: 'facebook_letter_facesregular';
     font-size: 250%;
     color: #ffffff;
 }
-.navbar-greenverse .navbar-brand:hover,
-.navbar-greenverse .navbar-brand:focus {
+/*makes navbar-brand unclickable*/
+/*
+.navbar-glassbar .navbar-brand:hover,
+.navbar-glassbar .navbar-brand:focus {
   color: rgba(256,256,256,0.1);
   background-color: transparent;
 }
-.navbar-greenverse .navbar-text {
+*/
+.navbar-glassbar .navbar-text {
   color: #999999;
 }
-.navbar-greenverse .navbar-nav > li > a {
+.navbar-glassbar .navbar-nav > li > a {
   color: #999999;
 }
-.navbar-greenverse .navbar-nav > li > a:hover,
-.navbar-greenverse .navbar-nav > li > a:focus {
+.navbar-glassbar .navbar-nav > li > a:hover,
+.navbar-glassbar .navbar-nav > li > a:focus {
   color: #fc941e;
   background-color: transparent;
 }
-.navbar-greenverse .navbar-nav > .active > a,
-.navbar-greenverse .navbar-nav > .active > a:hover,
-.navbar-greenverse .navbar-nav > .active > a:focus {
+.navbar-glassbar .navbar-nav > .active > a,
+.navbar-glassbar .navbar-nav > .active > a:hover,
+.navbar-glassbar .navbar-nav > .active > a:focus {
   color: #ffffff;
   background-color: #080808;
 }
-.navbar-greenverse .navbar-nav > .disabled > a,
-.navbar-greenverse .navbar-nav > .disabled > a:hover,
-.navbar-greenverse .navbar-nav > .disabled > a:focus {
+.navbar-glassbar .navbar-nav > .disabled > a,
+.navbar-glassbar .navbar-nav > .disabled > a:hover,
+.navbar-glassbar .navbar-nav > .disabled > a:focus {
   color: #444444;
   background-color: transparent;
 }
-.navbar-greenverse .navbar-toggle {
+.navbar-glassbar .navbar-toggle {
   border-color: #fc941e;
 }
-.navbar-greenverse .navbar-toggle:hover,
-.navbar-greenverse .navbar-toggle:focus {
+.navbar-glassbar .navbar-toggle:hover,
+.navbar-glassbar .navbar-toggle:focus {
   background-color: #fc941e;
 }
-.navbar-greenverse .navbar-toggle .icon-bar {
+.navbar-glassbar .navbar-toggle .icon-bar {
   background-color: #ffffff;
 }
-.navbar-greenverse .navbar-collapse,
-.navbar-greenverse .navbar-form {
+.navbar-glassbar .navbar-collapse,
+.navbar-glassbar .navbar-form {
   border-color: #101010;
 }
-.navbar-greenverse .navbar-nav > .open > a,
-.navbar-greenverse .navbar-nav > .open > a:hover,
-.navbar-greenverse .navbar-nav > .open > a:focus {
+.navbar-glassbar .navbar-nav > .open > a,
+.navbar-glassbar .navbar-nav > .open > a:hover,
+.navbar-glassbar .navbar-nav > .open > a:focus {
   background-color: #080808;
   color: #ffffff;
 }
 @media (max-width: 767px) {
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .dropdown-header {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .dropdown-header {
     border-color: #080808;
   }
-  .navbar-greenverse .navbar-nav .open .dropdown-menu .divider {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu .divider {
     background-color: #080808;
   }
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > li > a {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > li > a {
     color: #999999;
   }
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > li > a:focus {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > li > a:hover,
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > li > a:focus {
     color: #ffffff;
     background-color: transparent;
   }
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .active > a:focus {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .active > a,
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .active > a:hover,
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .active > a:focus {
     color: #ffffff;
     background-color: #080808;
   }
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .disabled > a,
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .disabled > a:hover,
-  .navbar-greenverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .disabled > a,
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+  .navbar-glassbar .navbar-nav .open .dropdown-menu > .disabled > a:focus {
     color: #444444;
     background-color: transparent;
   }
 }
-.navbar-greenverse .navbar-link {
+.navbar-glassbar .navbar-link {
   color: #999999;
 }
-.navbar-greenverse .navbar-link:hover {
+.navbar-glassbar .navbar-link:hover {
   color: #ffffff;
 }
 
@@ -1004,4 +1004,5 @@ td.datePickerMonth {
 }
 .dateBoxPopup {
 }
+
 
