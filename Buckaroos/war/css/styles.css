@@ -25,10 +25,15 @@ body {
 	width: 100%;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 .table-styling {
   border: 1px solid #FFF;
   padding: 3px;
   background-color: #585151;
+  cursor: pointer;
 }
 .table-styling.hover: hover{
   border: 1px solid #FFF;
