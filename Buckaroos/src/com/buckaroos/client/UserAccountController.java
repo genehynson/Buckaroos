@@ -239,6 +239,7 @@ public class UserAccountController implements ControllerInterface {
 //=============================
     
     private void doesLoginAccountExist(String username) {
+		doesLoginAccountExist = true;
     	db.getUser(username, callbackUser);
     }
     
@@ -476,6 +477,8 @@ public class UserAccountController implements ControllerInterface {
     
     @Override
     public void generateCashFlowReport() {
+    	changeDates = true;
+    	db.getCashFlowReportInfo(user.getUsername(), beginDate, endDate, callbackHashMap);
     }
     
     @Override
@@ -526,8 +529,12 @@ public class UserAccountController implements ControllerInterface {
 				}
 				loginUser = false;
 			} else if (registerUser) {
-				RootPanel.get("page").clear();
-				welcomeEmail(user.getUsername());
+				if (result == null) {
+					Window.alert("An error occured.");
+				} else {
+					RootPanel.get("page").clear();
+					welcomeEmail(user.getUsername());
+				}
 				registerUser = false;
 			} else if (updateCurrentUser) {
 				user = (User) result;
@@ -634,7 +641,6 @@ public class UserAccountController implements ControllerInterface {
 	}
 	
 	public void registerUser(String name, String password, String email) {
-		doesLoginAccountExist = true;
 		aPassword = password;
 		aUsername = name;
 		aEmail = email;

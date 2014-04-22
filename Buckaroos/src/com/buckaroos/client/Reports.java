@@ -179,7 +179,7 @@ public class Reports extends Composite {
 		radioButtonPanel.add(cashFlow);
 		radioButtonPanel.add(incomeReport);
 		
-		hPanel = new VerticalPanel();
+		hPanel = new HorizontalPanel();
 		hPanel.add(fromDate);
 		hPanel.add(dash);
 		hPanel.add(toDate);

@@ -3,6 +3,7 @@ package com.buckaroos.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
@@ -13,7 +14,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("dBConnection")
 public interface DBConnection extends RemoteService {
 	
-	void addUser(User user);
+	User addUser(User user);
 	
 	User getUser(String username);
 
@@ -47,4 +48,7 @@ public interface DBConnection extends RemoteService {
 	
 	void sendTransactionHistoryOfAllUserAccounts(String recipientEmail,
             String username, List<AccountTransaction> transactions);
+	
+	HashMap<String, Double> getCashFlowReportInfo(String username,
+            String startDate, String endDate);
 }

@@ -99,7 +99,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
      * @throws SQLException Throws an exception if a user with the same username
      *             passed in already exists
      */
-    public void addUser(User user) {
+    public User addUser(User user) {
         // Will have to change test to whatever the name of the DB is that is
         // hosted by Deloitte
         createStatementForConnection();
@@ -115,6 +115,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
             System.out.println("Exception caught when adding user.");
             e.printStackTrace();
         }
+        return getUser(user.getUsername());
     }
 
     /**
@@ -436,10 +437,10 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
      * @return A map containing information required to generate a cash flow
      *         report
      */
-    public Map<String, Double> getCashFlowReportInfo(String username,
+    public HashMap<String, Double> getCashFlowReportInfo(String username,
             String startDate, String endDate) {
         List<Account> accList = getAllAccounts(username);
-        Map<String, Double> cashFlowMap = new HashMap<String, Double>();
+        HashMap<String, Double> cashFlowMap = new HashMap<String, Double>();
         double expenseAmount = 0;
         double incomeAmount = 0;
         for (Account acc : accList) {

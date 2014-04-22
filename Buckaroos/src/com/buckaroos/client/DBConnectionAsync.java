@@ -3,6 +3,7 @@ package com.buckaroos.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
@@ -11,7 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface DBConnectionAsync {
 
-	void addUser(User user, AsyncCallback callback);
+	void addUser(User user, AsyncCallback<User> callback);
 	
 	void getUser(String username, AsyncCallback<User> callback);
 
@@ -45,6 +46,8 @@ public interface DBConnectionAsync {
 	
 	void sendTransactionHistoryOfAllUserAccounts(String recipientEmail,
             String username, List<AccountTransaction> transactions, AsyncCallback callback);
+	void getCashFlowReportInfo(String username,
+            String startDate, String endDate, AsyncCallback<HashMap<String, Double>> callback);
 	
 	
 }
