@@ -18,4 +18,12 @@ public interface CurrencyInformationInterface {
      */
     public abstract String getSymbolOfCurrency(Enum<Money> currencyAbbrev);
 
+    /**
+     * Returns the currency code as a String
+     * 
+     * @param currencyAbbrev The abbreviation of the currency
+     * @return The currency code of the currency
+     */
+    public abstract String getCurrencyCode(Enum<Money> currencyAbbrev);
+
 }

@@ -1,6 +1,8 @@
 package com.buckaroos.utility;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -33,6 +35,7 @@ public class CurrencyConverter implements CurrencyConverterInterface {
     private static double FROMUSDTOMXN = 13.2492;
     private static double FROMUSDTOAED = 3.673;
     private static double FROMUSDTOBDT = 77.715;
+    private static final CurrencyInformationInterface cInfo = new CurrencyInformationProvider();
 
     /**
      * Fetch the current exchange rates whenever constructed
@@ -75,52 +78,25 @@ public class CurrencyConverter implements CurrencyConverterInterface {
     }
 
     /*
-     * Gets the current exchange rate for the currencies passed in.
-     * 
-     * @param fromCurrency The currency to convert from.
-     * 
-     * @param toCurrency The currency to convert to.
-     * 
-     * @return The exchange rate for the currencies.
-     * 
-     * @throws ClientProtocolException
-     * 
-     * @throws IOException
-     */
-    private static float getExchangeRates(Enum<Money> fromCurrency,
-            Enum<Money> toCurrency) throws ClientProtocolException, IOException {
-        @SuppressWarnings("resource")
-        HttpClient client = new DefaultHttpClient();
-
-        HttpGet a = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s="
-                + fromCurrency + toCurrency + "=X&f=l1&e=.csv");
-        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-        String responseBody = client.execute(a, responseHandler);
-
-        client.getConnectionManager().shutdown();
-        return Float.parseFloat(responseBody);
-    }
-
-    /*
      * Sets the current exchange rates for every currency that Buckaroos
      * supports.
      */
     private static void setExchangeRates() {
         try {
-            FROMUSDTOAUD = getExchangeRates(Money.USD, Money.AUD);
-            FROMUSDTOBRL = getExchangeRates(Money.USD, Money.BRL);
-            FROMUSDTOCAD = getExchangeRates(Money.USD, Money.CAD);
-            FROMUSDTOCNY = getExchangeRates(Money.USD, Money.CNY);
-            FROMUSDTOEUR = getExchangeRates(Money.USD, Money.EUR);
-            FROMUSDTOGBP = getExchangeRates(Money.USD, Money.GBP);
-            FROMUSDTOJPY = getExchangeRates(Money.USD, Money.JPY);
-            FROMUSDTOINR = getExchangeRates(Money.USD, Money.INR);
-            FROMUSDTOCHF = getExchangeRates(Money.USD, Money.CHF);
-            FROMUSDTORUB = getExchangeRates(Money.USD, Money.RUB);
-            FROMUSDTOMXN = getExchangeRates(Money.USD, Money.MXN);
-            FROMUSDTOAED = getExchangeRates(Money.USD, Money.AED);
-            FROMUSDTOBDT = getExchangeRates(Money.USD, Money.BDT);
+            Map<Money, Float> conversionRates = getExchangeRates();
+            FROMUSDTOAUD = conversionRates.get(Money.AUD);
+            FROMUSDTOBRL = conversionRates.get(Money.BRL);
+            FROMUSDTOCAD = conversionRates.get(Money.CAD);
+            FROMUSDTOCNY = conversionRates.get(Money.CNY);
+            FROMUSDTOEUR = conversionRates.get(Money.EUR);
+            FROMUSDTOGBP = conversionRates.get(Money.GBP);
+            FROMUSDTOJPY = conversionRates.get(Money.JPY);
+            FROMUSDTOINR = conversionRates.get(Money.INR);
+            FROMUSDTOCHF = conversionRates.get(Money.CHF);
+            FROMUSDTORUB = conversionRates.get(Money.RUB);
+            FROMUSDTOMXN = conversionRates.get(Money.MXN);
+            FROMUSDTOAED = conversionRates.get(Money.AED);
+            FROMUSDTOBDT = conversionRates.get(Money.BDT);
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -128,6 +104,42 @@ public class CurrencyConverter implements CurrencyConverterInterface {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    /*
+     * Gets the current exchange rates for all Buckaroos supported currencies.
+     * 
+     * @return The exchange rate for the currencies.
+     * 
+     * @throws ClientProtocolException
+     * 
+     * @throws IOException
+     */
+    @SuppressWarnings("resource")
+    private static Map<Money, Float> getExchangeRates() throws IOException {
+        Map<Money, Float> conversionRates = new HashMap<>();
+        HttpClient httpclient = new DefaultHttpClient();
+        StringBuffer sb = new StringBuffer();
+        for (Money currency : Money.values()) {
+            sb.append("s=").append("USD")
+                    .append(cInfo.getCurrencyCode(currency)).append("=X&");
+        }
+        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?"
+                + sb + "f=l1&e=.csv");
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+        String responseBody = httpclient.execute(httpGet, responseHandler);
+        httpclient.getConnectionManager().shutdown();
+        String[] lines = responseBody.split("\n");
+        if (lines.length != Money.values().length) {
+            throw new IllegalStateException("Currency data mismatch");
+        }
+        int i = 0;
+        float exchange;
+        for (Money currency : Money.values()) {
+            exchange = Float.parseFloat(lines[i++]);
+            conversionRates.put(currency, exchange);
+        }
+        return conversionRates;
     }
 
     /*
@@ -241,5 +253,4 @@ public class CurrencyConverter implements CurrencyConverterInterface {
         }
         return newValue;
     }
-
 }
