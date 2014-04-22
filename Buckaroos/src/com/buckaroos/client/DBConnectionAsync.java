@@ -3,6 +3,7 @@ package com.buckaroos.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
@@ -75,5 +76,15 @@ public interface DBConnectionAsync {
 
     void isPasswordCorrect(String username, String enteredPassword,
             AsyncCallback<Boolean> callback);
+
+    void getAccountListingReportInfo(String username,
+            AsyncCallback<Map<String, Double>> callback);
+
+    void getTransactionHistoryInfo(String username, String accountName,
+            String startDate, String endDate,
+            AsyncCallback<Map<String, List<AccountTransaction>>> callback);
+
+    void getCurrentTransactions(String username, String accountName,
+            AsyncCallback<List<AccountTransaction>> callback);
 
 }

@@ -3,6 +3,7 @@ package com.buckaroos.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
@@ -65,4 +66,13 @@ public interface DBConnection extends RemoteService {
     void deleteAccount(String username, String accountName);
 
     boolean isPasswordCorrect(String username, String enteredPassword);
+
+    Map<String, Double> getAccountListingReportInfo(String username);
+
+    Map<String, List<AccountTransaction>> getTransactionHistoryInfo(
+            String username, String accountName, String startDate,
+            String endDate);
+
+    List<AccountTransaction> getCurrentTransactions(String username,
+            String accountName);
 }
