@@ -211,4 +211,7 @@ public interface ControllerInterface {
 
 	public abstract void deleteAccount();
 
+	public abstract void completeEditTransaction(double newAmount,
+			String itemText, String categoryText, Date chosen, String string);
+
 }

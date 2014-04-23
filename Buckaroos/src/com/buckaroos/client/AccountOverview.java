@@ -76,7 +76,7 @@ public class AccountOverview extends Composite {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
 				receiverRowIndex = cell.getRowIndex();
-				controller.editTransaction(transactions.get(receiverRowIndex));
+				controller.editTransaction(transactions.get(receiverRowIndex - 1));
 				
 			}
 		});
@@ -90,7 +90,7 @@ public class AccountOverview extends Composite {
 			public void onClick(ClickEvent event) {
 				Cell cell = table.getCellForEvent(event);
 				receiverRowIndex = cell.getRowIndex();
-				controller.deleteTransaction(transactions.get(receiverRowIndex));
+				controller.deleteTransaction(transactions.get(receiverRowIndex - 1));
 			}
 		});
 		table.setText(0, 0, "Category");

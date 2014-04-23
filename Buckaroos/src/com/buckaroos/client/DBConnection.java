@@ -76,6 +76,11 @@ public interface DBConnection extends RemoteService {
 
     List<AccountTransaction> getCurrentTransactions(String username,
             String accountName);
+    
+    void editTransaction(AccountTransaction oldTransaction,
+            String username, String accountName, double amount,
+            String category, String transactionDate, String transactionTime,
+            String transType);
 
 //    void setUpForCurrencyConversion();
 

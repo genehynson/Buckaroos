@@ -87,6 +87,11 @@ public interface DBConnectionAsync {
 
     void getCurrentTransactions(String username, String accountName,
             AsyncCallback<List<AccountTransaction>> callback);
+    
+    void editTransaction(AccountTransaction oldTransaction,
+            String username, String accountName, double amount,
+            String category, String transactionDate, String transactionTime,
+            String transType, AsyncCallback callback);
 
 //    void setUpForCurrencyConversion(AsyncCallback callback);
 //

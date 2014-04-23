@@ -41,6 +41,7 @@ public class Transaction extends Composite {
     private int hour, minute;
     private Panel vPanel, timePanel, radioPanel, buttonPanel, amountPanel, currencyLabelPanel;
 	private List<String> currencies;
+	private boolean editing;
 
 	
 	public Transaction() {
@@ -118,9 +119,19 @@ public class Transaction extends Composite {
 					System.out.println(controller.getCurrentUser().getUsername());
 					System.out.println(controller.getCurrentAccount().getName());
 					if (withdraw.getValue()) {
+						if (editing) {
+							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+									chosen, "Withdrawl");
+							editing = false;
+						}
 						controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
 								chosen);
 					} else if (deposit.getValue()) {
+						if (editing) {
+							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+									chosen, "Deposit");
+							editing = false;
+						}
 						controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
 
 					}
@@ -179,6 +190,7 @@ public class Transaction extends Composite {
 	}
 	
 	public void setValues(String typeValue, double amountValue, String categoryValue, Date dateValue, String timeValue) {
+		editing = true;
 		amount.setText(String.valueOf(amountValue));
 		category.setText(categoryValue);
 		datePicker.setValue(dateValue);

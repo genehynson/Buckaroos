@@ -372,6 +372,63 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
     }
 
     /**
+     * Edits a transaction. We can edit the amount, category, date, time, and
+     * type. If you don't want to edit them, just pass in the same values from
+     * the old transaction
+     * 
+     * @param oldTransaction The transaction that is being edited.
+     * @param username The username with which the transaction is associated
+     * @param accountName The account name with which the transaction is
+     *            associated
+     * @param amount The new amount
+     * @param category The new category
+     * @param transactionDate The new date
+     * @param transactionTime The new time
+     * @param transType The new type
+     */
+    public void editTransaction(AccountTransaction oldTransaction,
+            String username, String accountName, double amount,
+            String category, String transactionDate, String transactionTime,
+            String transType) {
+        // AccountTransaction oldTransaction = getTransaction(username,
+        // accountName, amount, category, transactionDate, transactionTime);
+        String oldTransType = oldTransaction.getType();
+        double oldAmount = oldTransaction.getAmount();
+        if (oldTransType.equals("Withdrawal")) {
+            oldAmount = -oldAmount;
+        }
+        if (transType.equals("Withdrawal")) {
+            amount = -amount;
+        }
+        if (amount != oldAmount) {
+            double updateAmount = amount - oldAmount;
+            updateAccountBalance(username, accountName, updateAmount);
+        }
+        if (transType.equals("Withdrawal")) {
+            // Put the amount back to the original for storage in the db.
+            amount = -amount;
+        }
+        try {
+            query = connect.prepareStatement("UPDATE Transacions SET Amount = "
+                    + amount + ", Category = '" + category
+                    + "', TransactionDate = '" + transactionDate
+                    + "', TransactionTime = '" + transactionTime
+                    + "', TransactionType = '" + transType
+                    + "' WHERE Username = '" + username
+                    + "' AND AccountName = '" + accountName
+                    + "' AND Amount = '" + oldAmount + "' AND Category "
+                    + "= '" + oldTransaction.getCategory()
+                    + "' AND TransactionDate = '" + oldTransaction.getDate()
+                    + "' AND TransactionTime = '" + oldTransaction.getTime()
+                    + "'");
+            System.out.println(query);
+            query.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
      * Updates an account with a new balance
      * 
      * @param username The username of the account that is logged in

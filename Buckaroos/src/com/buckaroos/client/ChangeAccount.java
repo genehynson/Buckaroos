@@ -85,7 +85,7 @@ public class ChangeAccount extends Composite {
 		} else {
 			table.setText(0, 0, "Name");
 			table.setText(0, 1, "Balance");
-			for (int i = 2; i < userAccounts.size() + 1; i++) {
+			for (int i = 1; i < userAccounts.size() + 1; i++) {
 				int index = i - 1;
 				table.setText(i, 0, userAccounts.get(index).getName());
 				table.setText(i, 1, String.valueOf(userAccounts.get(index).getBalance()));

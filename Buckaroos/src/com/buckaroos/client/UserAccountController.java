@@ -34,6 +34,7 @@ public class UserAccountController implements ControllerInterface {
 
     private static User user = new User(" ", " ", " ");
     private static Account currentAccount;
+    private static AccountTransaction currentTransaction;
     private static List<Account> userAccounts = new ArrayList<Account>();
     private static List<AccountTransaction> userTransactions;
     private static Map<String, Double> reportTransactions;
@@ -79,6 +80,7 @@ public class UserAccountController implements ControllerInterface {
     private boolean doesLoginAccountExist = false;
     private boolean addAccount = false;
     private boolean addTransaction = false;
+    private boolean editTransaction = false;
     private boolean changeDates = false;
     private boolean deleteTransaction = false;
     private boolean sendingResetPasswordEmail = false;
@@ -88,7 +90,7 @@ public class UserAccountController implements ControllerInterface {
     private boolean deleteAccount = false;
     private boolean convertCurrency = false;
     private boolean checkPassword = false;
-    
+    private boolean addFirstAccount = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -594,7 +596,8 @@ public class UserAccountController implements ControllerInterface {
 				RootPanel.get("page").clear();
 				createAccountOverview();
 				deleteTransaction = false;
-				
+			} else if (editTransaction) {
+				editTransaction = false;
 			} else if (deleteAccount) {
 				
 				RootPanel.get("page").clear();
@@ -682,14 +685,32 @@ public class UserAccountController implements ControllerInterface {
 	}
 	
 	public void editTransaction(AccountTransaction t) {
+		currentTransaction = t;
 		RootPanel.get("page").clear();
 		transaction = new Transaction();
 		Date d = convertStringToDate(t.getDate());
 		String time = d.getHours() + ":" + d.getMinutes();
 		transaction.setValues(t.getType(), t.getAmount(), t.getCategory(), d, time);
-		deleteTransaction(t);
+		System.out.println(t.getType());
+		System.out.println(t.getAmount());
+		System.out.println(t.getCategory());
+		System.out.println(d);
+		System.out.println(time);
 	}
 	
+	public void completeEditTransaction(double newAmount,
+			String currency, String categoryText, Date chosen, String type) {
+		Date time = new Date();
+		time.setHours(chosen.getHours());
+		time.setMinutes(chosen.getMinutes());
+		editTransaction = true;
+		System.out.println(type);
+		System.out.println(newAmount);
+		System.out.println(categoryText);
+		System.out.println(chosen);
+		System.out.println(time);
+		db.editTransaction(currentTransaction, user.getUsername(), currentAccount.getName(), newAmount, categoryText, convertDateToString(chosen), convertDateToString(time), type, callbackVoid);
+	}
 	public void deleteTransaction(AccountTransaction t) {
 		deleteTransaction = true;
 		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
