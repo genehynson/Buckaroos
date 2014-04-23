@@ -10,7 +10,6 @@ import com.buckaroos.server.Account;
 import com.buckaroos.server.AccountTransaction;
 import com.buckaroos.server.User;
 import com.buckaroos.utility.CurrencyConverter;
-import com.buckaroos.utility.CurrencyConverterInterface;
 import com.buckaroos.utility.CurrencyInformationProvider;
 import com.buckaroos.utility.Money;
 import com.google.gwt.core.client.GWT;
@@ -162,7 +161,7 @@ public class UserAccountController implements ControllerInterface {
             String category, Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
-      //  amount = checkCurrency(amount, currencyType);
+        amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Withdrawal", currencyType, category, dateString, timeString, callbackTransaction);
@@ -173,7 +172,7 @@ public class UserAccountController implements ControllerInterface {
             Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
-  //      amount = checkCurrency(amount, currencyType);
+        amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Deposit", currencyType, category, dateString, timeString, callbackTransaction);
@@ -182,7 +181,8 @@ public class UserAccountController implements ControllerInterface {
     private double checkCurrency(double amount, String currencyType) {
     	if (currencyType != "USD") {
     		convertCurrency = true;
-//    		db.convertCurrency(Money.valueOf(currencyType), Money.USD, amount, callbackDouble);
+    		CurrencyConverter cc = new CurrencyConverter();
+    		amount = cc.convertCurrency(Money.valueOf(currencyType), Money.USD, amount);
     	}
     	return amount;
     }
@@ -732,6 +732,7 @@ public class UserAccountController implements ControllerInterface {
 	
 	public void completeEditTransaction(double newAmount,
 			String currency, String categoryText, Date chosen, String type) {
+		newAmount = checkCurrency(newAmount, currency);
 		int hours = chosen.getHours();
 		int minutes = chosen.getMinutes();
 		String hoursString = "";

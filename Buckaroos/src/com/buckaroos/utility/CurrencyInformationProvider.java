@@ -7,8 +7,7 @@ package com.buckaroos.utility;
  * @author Jordan LeRoux
  * @version 1.1
  */
-public class CurrencyInformationProvider implements
-        CurrencyInformationInterface {
+public class CurrencyInformationProvider implements CurrencyInformationInterface {
 
     @Override
     public String getFullCurrencyName(Enum<Money> currencyAbbrev) {
@@ -47,7 +46,7 @@ public class CurrencyInformationProvider implements
     public String getSymbolOfCurrency(Enum<Money> currencyAbbrev) {
         // Locale locale = Locale.UK;
         // Currency curr = Currency.getInstance(locale);
-        String symbol = "";
+    	String symbol = "";
         if (currencyAbbrev == Money.valueOf("AUD")) {
             symbol = "AU$";
         } else if (currencyAbbrev == Money.valueOf("BRL")) {
@@ -59,7 +58,7 @@ public class CurrencyInformationProvider implements
         } else if (currencyAbbrev == Money.valueOf("EUR")) {
             symbol = "\u20ac";
         } else if (currencyAbbrev == Money.valueOf("GBP")) {
-            // unicode symbol is "\u00A3"
+        	//unicode symbol is "\u00A3"
             symbol = "£";
         } else if (currencyAbbrev == Money.valueOf("JPY")) {
             symbol = "J" + "\u00A5";
@@ -77,38 +76,5 @@ public class CurrencyInformationProvider implements
             symbol = "\u09F3";
         }
         return symbol;
-    }
-
-    @Override
-    public String getCurrencyCode(Enum<Money> currencyAbbrev) {
-        String currencyCode = "";
-        if (currencyAbbrev == Money.valueOf("AUD")) {
-            currencyCode = "AUD";
-        } else if (currencyAbbrev == Money.valueOf("BRL")) {
-            currencyCode = "BRL";
-        } else if (currencyAbbrev == Money.valueOf("CAD")) {
-            currencyCode = "CAD";
-        } else if (currencyAbbrev == Money.valueOf("CNY")) {
-            currencyCode = "CNY";
-        } else if (currencyAbbrev == Money.valueOf("EUR")) {
-            currencyCode = "EUR";
-        } else if (currencyAbbrev == Money.valueOf("GBP")) {
-            currencyCode = "GBP";
-        } else if (currencyAbbrev == Money.valueOf("JPY")) {
-            currencyCode = "JPY";
-        } else if (currencyAbbrev == Money.valueOf("INR")) {
-            currencyCode = "INR";
-        } else if (currencyAbbrev == Money.valueOf("CHF")) {
-            currencyCode = "CHF";
-        } else if (currencyAbbrev == Money.valueOf("RUB")) {
-            currencyCode = "RUB";
-        } else if (currencyAbbrev == Money.valueOf("MXN")) {
-            currencyCode = "MXN";
-        } else if (currencyAbbrev == Money.valueOf("AED")) {
-            currencyCode = "AED";
-        } else if (currencyAbbrev == Money.valueOf("BDT")) {
-            currencyCode = "BDT";
-        }
-        return currencyCode;
     }
 }

@@ -1,63 +1,32 @@
 package com.buckaroos.utility;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 /**
  * This class supports conversion from one type of currency to another.
  * Supported currencies are USD, AUD, BRL, CAD, CNY, EUR, GBP, JPY, INR, CHF,
  * RUB, MXN, AED, and BDT.
  * 
  * @author Jordan LeRoux
- * @version 1.1
+ * @version 1.0
  */
-@SuppressWarnings("deprecation")
 public class CurrencyConverter implements CurrencyConverterInterface {
 
-    private static double FROMUSDTOAUD = 1.1206;
-    private static double FROMUSDTOBRL = 2.3443;
-    private static double FROMUSDTOCAD = 1.1064;
-    private static double FROMUSDTOCNY = 6.1451;
-    private static double FROMUSDTOEUR = 0.7245;
-    private static double FROMUSDTOGBP = 0.5972;
-    private static double FROMUSDTOJPY = 101.8;
-    private static double FROMUSDTOINR = 61.7575;
-    private static double FROMUSDTOCHF = 0.8803;
-    private static double FROMUSDTORUB = 35.8641;
-    private static double FROMUSDTOMXN = 13.2492;
-    private static double FROMUSDTOAED = 3.673;
-    private static double FROMUSDTOBDT = 77.715;
-    private static final CurrencyInformationInterface cInfo = new CurrencyInformationProvider();
-
-    /**
-     * Fetch the current exchange rates whenever constructed
-     */
-    public CurrencyConverter() {
-        // Consider adding a table to the database and then storing a date in
-        // the database and compare the date in the database with the current
-        // date and if they don't match to the hour, then set the exchange
-        // rates.
-        // This would prevent us having to update the exchange rates every time
-        // a conversion is called because this can be quite slow when first
-        // constructed.
-        setExchangeRates();
-    }
+    private static final double FROMUSDTOAUD = 1.1206;
+    private static final double FROMUSDTOBRL = 2.3443;
+    private static final double FROMUSDTOCAD = 1.1064;
+    private static final double FROMUSDTOCNY = 6.1451;
+    private static final double FROMUSDTOEUR = 0.7245;
+    private static final double FROMUSDTOGBP = 0.5972;
+    private static final double FROMUSDTOJPY = 101.8;
+    private static final double FROMUSDTOINR = 61.7575;
+    private static final double FROMUSDTOCHF = 0.8803;
+    private static final double FROMUSDTORUB = 35.8641;
+    private static final double FROMUSDTOMXN = 13.2492;
+    private static final double FROMUSDTOAED = 3.673;
+    private static final double FROMUSDTOBDT = 77.715;
 
     @Override
     public double convertCurrency(Enum<Money> fromCurrency,
             Enum<Money> toCurrency, double amount) {
-        if (fromCurrency == null || toCurrency == null) {
-            throw new IllegalArgumentException("Can't convert from null or to "
-                    + "null currency.");
-        }
         double newAmount = 0;
         if (fromCurrency != Money.valueOf("USD")
                 && toCurrency != Money.valueOf("USD")) {
@@ -75,71 +44,6 @@ public class CurrencyConverter implements CurrencyConverterInterface {
             newAmount = amount;
         }
         return newAmount;
-    }
-
-    /*
-     * Sets the current exchange rates for every currency that Buckaroos
-     * supports.
-     */
-    private static void setExchangeRates() {
-        try {
-            Map<Money, Float> conversionRates = getExchangeRates();
-            FROMUSDTOAUD = conversionRates.get(Money.AUD);
-            FROMUSDTOBRL = conversionRates.get(Money.BRL);
-            FROMUSDTOCAD = conversionRates.get(Money.CAD);
-            FROMUSDTOCNY = conversionRates.get(Money.CNY);
-            FROMUSDTOEUR = conversionRates.get(Money.EUR);
-            FROMUSDTOGBP = conversionRates.get(Money.GBP);
-            FROMUSDTOJPY = conversionRates.get(Money.JPY);
-            FROMUSDTOINR = conversionRates.get(Money.INR);
-            FROMUSDTOCHF = conversionRates.get(Money.CHF);
-            FROMUSDTORUB = conversionRates.get(Money.RUB);
-            FROMUSDTOMXN = conversionRates.get(Money.MXN);
-            FROMUSDTOAED = conversionRates.get(Money.AED);
-            FROMUSDTOBDT = conversionRates.get(Money.BDT);
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    /*
-     * Gets the current exchange rates for all Buckaroos supported currencies.
-     * 
-     * @return The exchange rate for the currencies.
-     * 
-     * @throws ClientProtocolException
-     * 
-     * @throws IOException
-     */
-    @SuppressWarnings("resource")
-    private static Map<Money, Float> getExchangeRates() throws IOException {
-        Map<Money, Float> conversionRates = new HashMap<>();
-        HttpClient httpclient = new DefaultHttpClient();
-        StringBuffer sb = new StringBuffer();
-        for (Money currency : Money.values()) {
-            sb.append("s=").append("USD")
-                    .append(cInfo.getCurrencyCode(currency)).append("=X&");
-        }
-        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?"
-                + sb + "f=l1&e=.csv");
-        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        String responseBody = httpclient.execute(httpGet, responseHandler);
-        httpclient.getConnectionManager().shutdown();
-        String[] lines = responseBody.split("\n");
-        if (lines.length != Money.values().length) {
-            throw new IllegalStateException("Currency data mismatch");
-        }
-        int i = 0;
-        float exchange;
-        for (Money currency : Money.values()) {
-            exchange = Float.parseFloat(lines[i++]);
-            conversionRates.put(currency, exchange);
-        }
-        return conversionRates;
     }
 
     /*
@@ -253,4 +157,5 @@ public class CurrencyConverter implements CurrencyConverterInterface {
         }
         return newValue;
     }
+
 }
