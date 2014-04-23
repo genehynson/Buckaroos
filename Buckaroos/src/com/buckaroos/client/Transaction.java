@@ -112,35 +112,36 @@ public class Transaction extends Composite {
 				hour = hourBox.getSelectedIndex() + 1;
 				minute = minuteBox.getSelectedIndex() + 1;
 				double newAmount;
-				Date chosen = datePicker.getValue();
-				chosen.setHours(hour);
-				chosen.setMinutes(minute);
-				if (!amount.getText().toString().equals("")) {
+				Date chosen = new Date();
+				if (datePicker.getValue() != null) {
+					chosen = datePicker.getValue();
+					chosen.setHours(hour);
+					chosen.setMinutes(minute);
+				}
+				if (!amount.getText().toString().equals("") && datePicker.getHighlightedDate() != null && !category.getText().equals("")) {
 					newAmount = Double.parseDouble(amount.getText().toString());
 					String categoryText = category.getText().toString().toLowerCase();
 					System.out.println(controller.getCurrentUser().getUsername());
 					System.out.println(controller.getCurrentAccount().getName());
-					if (datePicker.getHighlightedDate() != null && !category.getText().equals("") && amount.getText().equals("")) {
-						if (withdraw.getValue()) {
-							if (editing) {
-								controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-										chosen, "Withdrawl");
-								editing = false;
-							}
-							controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-									chosen);
-						} else if (deposit.getValue()) {
-							if (editing) {
-								controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-										chosen, "Deposit");
-								editing = false;
-							}
-							controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
-
+					if (withdraw.getValue()) {
+						if (editing) {
+							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+									chosen, "Withdrawl");
+							editing = false;
 						}
-					} else {
-						Window.alert("Please enter all fields.");
+						controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+								chosen);
+					} else if (deposit.getValue()) {
+						if (editing) {
+							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+									chosen, "Deposit");
+							editing = false;
+						}
+						controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
+
 					}
+				} else {
+					Window.alert("Please enter all fields.");
 				}
 			}
 		});
