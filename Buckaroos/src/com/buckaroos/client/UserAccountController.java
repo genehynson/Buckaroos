@@ -547,6 +547,7 @@ public class UserAccountController implements ControllerInterface {
 			} else if (updateCurrentAccount) {
 				
 				currentAccount = (Account) result;
+				System.out.println(currentAccount.getName());
 				updateCurrentAccount = false;
 				db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
 				createAccountOverview = true;
@@ -689,7 +690,22 @@ public class UserAccountController implements ControllerInterface {
 		RootPanel.get("page").clear();
 		transaction = new Transaction();
 		Date d = convertStringToDate(t.getDate());
-		String time = d.getHours() + ":" + d.getMinutes();
+		int hours = d.getHours();
+		int minutes = d.getMinutes();
+		String hoursString = "";
+		String minutesString = "";
+		String time = "";
+		if (hours < 10) {
+			hoursString = "0" + hours;
+		} else {
+			hoursString = String.valueOf(hours);
+		}
+		if (minutes < 10) {
+			minutesString = "0" + minutes;
+		} else {
+			minutesString = String.valueOf(minutes);
+		}
+		time = hoursString + ":" + minutesString;
 		transaction.setValues(t.getType(), t.getAmount(), t.getCategory(), d, time);
 		System.out.println(t.getType());
 		System.out.println(t.getAmount());
@@ -700,16 +716,29 @@ public class UserAccountController implements ControllerInterface {
 	
 	public void completeEditTransaction(double newAmount,
 			String currency, String categoryText, Date chosen, String type) {
-		Date time = new Date();
-		time.setHours(chosen.getHours());
-		time.setMinutes(chosen.getMinutes());
+		int hours = chosen.getHours();
+		int minutes = chosen.getMinutes();
+		String hoursString = "";
+		String minutesString = "";
+		String time = "";
+		if (hours < 10) {
+			hoursString = "0" + hours;
+		} else {
+			hoursString = String.valueOf(hours);
+		}
+		if (minutes < 10) {
+			minutesString = "0" + minutes;
+		} else {
+			minutesString = String.valueOf(minutes);
+		}
+		time = hoursString + ":" + minutesString;
 		editTransaction = true;
 		System.out.println(type);
 		System.out.println(newAmount);
 		System.out.println(categoryText);
 		System.out.println(chosen);
 		System.out.println(time);
-		db.editTransaction(currentTransaction, user.getUsername(), currentAccount.getName(), newAmount, categoryText, convertDateToString(chosen), convertDateToString(time), type, callbackVoid);
+		db.editTransaction(currentTransaction, user.getUsername(), currentAccount.getName(), newAmount, categoryText, convertDateToString(chosen), time, type, callbackVoid);
 	}
 	public void deleteTransaction(AccountTransaction t) {
 		deleteTransaction = true;

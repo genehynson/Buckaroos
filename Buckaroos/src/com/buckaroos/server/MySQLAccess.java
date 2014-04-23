@@ -409,7 +409,7 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
             amount = -amount;
         }
         try {
-            query = connect.prepareStatement("UPDATE Transacions SET Amount = "
+            query = connect.prepareStatement("UPDATE Transactions SET Amount = "
                     + amount + ", Category = '" + category
                     + "', TransactionDate = '" + transactionDate
                     + "', TransactionTime = '" + transactionTime
