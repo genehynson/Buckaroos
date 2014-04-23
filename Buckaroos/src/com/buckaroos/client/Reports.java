@@ -113,6 +113,7 @@ public class Reports extends Composite {
     	    	}
     	    	controller.changeDates(beginDate, afterDate);
     	    	System.out.println(beginDate);
+    	    	spendingReport.setValue(true);
     		}
     	});
     	toDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
@@ -127,6 +128,7 @@ public class Reports extends Composite {
     	    		fromDate.getTextBox().setText("today");
     	    	}
     	    	controller.changeDates(beginDate, afterDate);
+    	    	spendingReport.setValue(true);
     		}
     	});
     	menu = new Button();

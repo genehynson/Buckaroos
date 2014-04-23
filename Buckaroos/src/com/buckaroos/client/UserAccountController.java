@@ -36,7 +36,7 @@ public class UserAccountController implements ControllerInterface {
     private static Account currentAccount;
     private static AccountTransaction currentTransaction;
     private static List<Account> userAccounts = new ArrayList<Account>();
-    private static List<AccountTransaction> userTransactions;
+    private static List<AccountTransaction> userTransactions = new ArrayList<AccountTransaction>();
     private static Map<String, Double> reportTransactions;
     private static List<String> reportTransactionNames;
     
@@ -90,7 +90,7 @@ public class UserAccountController implements ControllerInterface {
     private boolean deleteAccount = false;
     private boolean convertCurrency = false;
     private boolean checkPassword = false;
-    private boolean addFirstAccount = false;
+    private boolean rollbackTransaction = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -579,6 +579,11 @@ public class UserAccountController implements ControllerInterface {
 					createChangeAccount();
 				}
 				addAccount = false;
+			} else if (rollbackTransaction) {
+				
+				RootPanel.get("page").clear();
+				createAccountOverview();
+				rollbackTransaction = false;
 				
 			} else if (addTransaction) {
 				
@@ -756,6 +761,10 @@ public class UserAccountController implements ControllerInterface {
 		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
 	}
 	
+	public void rollbackTransaction(AccountTransaction t) {
+		rollbackTransaction = true;
+		db.rollBackTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getDate(), t.getTime(), callbackTransaction);
+	}
 	public void deleteAccount() {
 		deleteAccount = true;
 		db.deleteAccount(user.getUsername(), currentAccount.getName(), callbackVoid);

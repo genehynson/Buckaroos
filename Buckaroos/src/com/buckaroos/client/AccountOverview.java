@@ -28,7 +28,7 @@ public class AccountOverview extends Composite {
 	}
 	@UiField
 	Label accountName, title, accountBalanceInfo;
-	Button menu, report, addTransaction, edit, delete, deleteAccount;
+	Button menu, report, addTransaction, edit, delete, deleteAccount, rollback;
 	FlexTable table;
 	
 	private ControllerInterface controller;
@@ -52,7 +52,7 @@ public class AccountOverview extends Composite {
 		menu = new Button();
 		menu.setText("Select Account");
 		menu.addStyleName("blue-button");
-
+		
 		deleteAccount = new Button();
 		deleteAccount.setText("Delete This Account");
 		deleteAccount.addStyleName("blue-button");
@@ -70,6 +70,16 @@ public class AccountOverview extends Composite {
 		accountName.setText(controller.getCurrentAccount().getName());
 		edit = new Button("Edit");
 		edit.addStyleName("black-text");
+		rollback = new Button("Rollback");
+		rollback.addStyleName("black-text");
+		rollback.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				Cell cell = table.getCellForEvent(event);
+				receiverRowIndex = cell.getRowIndex();
+				controller.rollbackTransaction(transactions.get(receiverRowIndex - 1));
+				
+			}
+		});
 		delete = new Button("Delete");
 		delete.addStyleName("black-text");
 		edit.addClickHandler(new ClickHandler() {
@@ -121,7 +131,8 @@ public class AccountOverview extends Composite {
 				receiverRowIndex = cell.getRowIndex();
 				if (receiverRowIndex != 0) {
 					table.setWidget(receiverRowIndex, 5, edit);
-					table.setWidget(receiverRowIndex, 6, delete);
+					table.setWidget(receiverRowIndex, 6, rollback);
+					table.setWidget(receiverRowIndex, 7, delete);
 				}
 			}
 		});
