@@ -82,8 +82,4 @@ public interface DBConnection extends RemoteService {
             String category, String transactionDate, String transactionTime,
             String transType);
 
-//    void setUpForCurrencyConversion();
-
-//    double convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
-//            double amount);
 }

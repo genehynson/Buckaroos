@@ -92,9 +92,4 @@ public interface DBConnectionAsync {
             String username, String accountName, double amount,
             String category, String transactionDate, String transactionTime,
             String transType, AsyncCallback callback);
-
-//    void setUpForCurrencyConversion(AsyncCallback callback);
-//
-//    void convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
-//            double amount, AsyncCallback<Double> callback);
 }

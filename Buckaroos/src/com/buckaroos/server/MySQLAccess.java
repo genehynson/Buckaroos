@@ -49,8 +49,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * @author Jordan
  * @version 1.0
  */
-public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
-        CurrencyConverterInterface {
+public class MySQLAccess extends RemoteServiceServlet implements DBConnection {
     /**
 	 * 
 	 */
@@ -958,12 +957,5 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
             me.printStackTrace();
         }
     }
-
-	@Override
-	public double convertCurrency(Enum<Money> fromCurrency,
-			Enum<Money> toCurrency, double amount) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 }
