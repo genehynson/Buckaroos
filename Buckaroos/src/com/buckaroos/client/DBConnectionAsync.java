@@ -88,8 +88,8 @@ public interface DBConnectionAsync {
     void getCurrentTransactions(String username, String accountName,
             AsyncCallback<List<AccountTransaction>> callback);
 
-    void setUpForCurrencyConversion(AsyncCallback callback);
-
-    void convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
-            double amount, AsyncCallback<Double> callback);
+//    void setUpForCurrencyConversion(AsyncCallback callback);
+//
+//    void convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
+//            double amount, AsyncCallback<Double> callback);
 }

@@ -99,7 +99,7 @@ public class AccountOverview extends Composite {
 		table.setText(0, 3, "Type");
 		table.setText(0, 4, "Date");
 		
-		for (int i = 1; i < transactions.size(); i++) {
+		for (int i = 1; i < transactions.size() + 1; i++) {
 			int index = i-1;
 			table.setText(i, 0, transactions.get(index).getCategory());
 			table.setText(i, 1, String.valueOf(transactions.get(index).getAmount()));

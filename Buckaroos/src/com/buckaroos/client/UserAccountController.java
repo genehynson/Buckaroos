@@ -65,6 +65,8 @@ public class UserAccountController implements ControllerInterface {
     private AsyncCallback<List<AccountTransaction>> callbackListTransactions;
     private AsyncCallback<ArrayList<Account>> callbackListAccounts;
     private AsyncCallback<HashMap<String, Double>> callbackHashMap;
+    private AsyncCallback<Double> callbackDouble; 
+    private AsyncCallback<Boolean> callbackBoolean;
     private AsyncCallback callbackVoid;
 
     private boolean createChangeAccount = false;
@@ -84,6 +86,9 @@ public class UserAccountController implements ControllerInterface {
     private boolean updateUser = false;
     private boolean updateCurrentAccount = false;
     private boolean deleteAccount = false;
+    private boolean convertCurrency = false;
+    private boolean checkPassword = false;
+    
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -155,7 +160,7 @@ public class UserAccountController implements ControllerInterface {
             String category, Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
-        amount = checkCurrency(amount, currencyType);
+      //  amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Withdrawal", currencyType, category, dateString, timeString, callbackTransaction);
@@ -166,7 +171,7 @@ public class UserAccountController implements ControllerInterface {
             Date date) {
         String dateString = convertDateToString(date);
         String timeString = convertTimeToString(date);
-        amount = checkCurrency(amount, currencyType);
+  //      amount = checkCurrency(amount, currencyType);
         addTransaction = true;
         db.addTransaction(user.getUsername(), currentAccount.getName(), amount,
                 "Deposit", currencyType, category, dateString, timeString, callbackTransaction);
@@ -174,8 +179,8 @@ public class UserAccountController implements ControllerInterface {
     
     private double checkCurrency(double amount, String currencyType) {
     	if (currencyType != "USD") {
-    		CurrencyConverterInterface convert = new CurrencyConverter();
-    		amount = convert.convertCurrency(Money.valueOf(currencyType), Money.USD, amount);
+    		convertCurrency = true;
+//    		db.convertCurrency(Money.valueOf(currencyType), Money.USD, amount, callbackDouble);
     	}
     	return amount;
     }
@@ -190,22 +195,9 @@ public class UserAccountController implements ControllerInterface {
     private void storeAccount(String accountName, String password, String email) {
     	User newUser = new User(accountName, password, email);
     	if (accountName != null && email != null && password != null) {
-//            MessageDigest md;
-//            try {
-//                md = MessageDigest.getInstance("MD5");
-//                md.update(password.getBytes());
-//                byte[] digest = md.digest();
-//                StringBuffer sb = new StringBuffer();
-//                for (byte b : digest) {
-//                    sb.append(Integer.toHexString((int) (b & 0xff)));
-//                }
-//                newUser = new User(accountName, sb.toString(), email);
     		user = newUser;
 			registerUser = true;
     		db.addUser(newUser, callbackUser);
-//            } catch (NoSuchAlgorithmException e1) {
-//                // Do Nothing
-//            }
     	}
     }
     
@@ -272,31 +264,9 @@ public class UserAccountController implements ControllerInterface {
     	return false;
     }
     
-    private boolean isPasswordCorrect(String username, String aPassword, String thePassword) {
-    	StringBuffer sb = null;
-    	System.out.println("TheAccount: " + username);
-    	System.out.println("ThePassword: " + thePassword);
-//        MessageDigest md;
-//        sb = new StringBuffer();
-//        sb.append("");
-//        try {
-//            md = MessageDigest.getInstance("MD5");
-//            md.update(aPassword.getBytes());
-//            byte[] digest = md.digest();
-//            sb.replace(0, 0, "");
-//            for (byte b : digest) {
-//                sb.append(Integer.toHexString((int) (b & 0xff)));
-//            }
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println("aPassword: " + sb.toString());
-//        if (thePassword.equals(sb.toString())) {
-    	if (thePassword.equals(aPassword)) {
-    		return true;
-    	}
-    	user = null;
-    	return false;
+    private void isPasswordCorrect(String username, String aPassword) {
+    	checkPassword = true;
+    	db.isPasswordCorrect(username, aPassword, callbackVoid);
     }
     
 //============================
@@ -518,29 +488,47 @@ public class UserAccountController implements ControllerInterface {
 
 		@Override
 		public void onSuccess(T result) {
+			
 			if (createChangeAccount) {
+				
 				userAccounts = (List<Account>) result;
 				changeAccount = new ChangeAccount(userAccounts);
 				createChangeAccount = false;
+				
 			} else if (createAccountOverview) {
+				
 				userTransactions = (List<AccountTransaction>) result;
 				accountOverview = new AccountOverview(userTransactions);
 				createAccountOverview = false;
+				
 			} else if (createReports) {
+				
 				reportTransactions = (Map<String, Double>) result;
 				reportTransactionNames.addAll(reportTransactions.keySet());
 				reports = new Reports(reportTransactions, reportTransactionNames);
 				createReports = false;
+				
 			} else if (loginUser) {
+				
 				user = (User) result;
-				if (result != null && isPasswordCorrect(user.getUsername(), aPassword, user.getPassword())) {
+				if (result != null) {
+					isPasswordCorrect(user.getUsername(), aPassword);
+				} else {
+					login.displayNotCorrect();
+				}
+				loginUser = false;
+				
+			} else if (checkPassword) {
+				
+				if ((Boolean) result) {
 					RootPanel.get("page").clear();
 					createChangeAccount();
 				} else {
 					login.displayNotCorrect();
 				}
-				loginUser = false;
+				
 			} else if (registerUser) {
+				
 				if (result == null) {
 					Window.alert("An error occured.");
 				} else {
@@ -548,26 +536,36 @@ public class UserAccountController implements ControllerInterface {
 					welcomeEmail(user.getUsername());
 				}
 				registerUser = false;
+				
 			} else if (updateCurrentUser) {
+				
 				user = (User) result;
 				updateCurrentUser = false;
+				
 			} else if (updateCurrentAccount) {
+				
 				currentAccount = (Account) result;
 				updateCurrentAccount = false;
 				db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
 				createAccountOverview = true;
+				
 			} else if (doesLoginAccountExist) {
+				
 				if (result == null) {
 					storeAccount(aUsername, aPassword, aEmail);
 				} else {
 					register.displayAccountAlreadyExists();
 				}
 				doesLoginAccountExist = false;
+				
 			} else if (createCreateAccount) {
+				
 				userAccounts = (List<Account>) result;
 				createAccount = new CreateAccount();
 				createCreateAccount = false;
+				
 			} else if (addAccount) {
+				
 				if (doesAccountExist(currentAccount.getName())) {
 					createAccount.displayAccountAlreadyExists();
 				} else {
@@ -575,46 +573,61 @@ public class UserAccountController implements ControllerInterface {
 					createChangeAccount();
 				}
 				addAccount = false;
+				
 			} else if (addTransaction) {
+				
 				RootPanel.get("page").clear();
 				createAccountOverview();
 				addTransaction = false;
+				
 			} else if (changeDates) {
+				
 				reportTransactions = new HashMap<String, Double>();
 				reportTransactions = (Map<String, Double>) result;
 				reportTransactionNames = new ArrayList<String>();
 				reportTransactionNames.addAll(reportTransactions.keySet());
-				System.out.println(reportTransactions.get("food"));
-				System.out.println(reportTransactions.size());
 				reports.setTransactionLists(reportTransactions, reportTransactionNames);
 				changeDates = false;
+				
 			} else if (deleteTransaction) {
+				
 				RootPanel.get("page").clear();
 				createAccountOverview();
 				deleteTransaction = false;
+				
 			} else if (deleteAccount) {
+				
 				RootPanel.get("page").clear();
 				createChangeAccount();
+				
 			} else if (sendingResetPasswordEmail) {
+				
 				user = (User) result;
 				if (user != null) {
 					db.sendResetPassword(user.getEmail(), user.getPassword(), user.getUsername(), callbackVoid);
-					System.out.println("Not null...email should have sent");
 					Window.alert("Email sent.");
 				} else {
 					System.out.println("User is null");
 					Window.alert("Not valid username. Please enter valid username and try again.");
 				}
 				sendingResetPasswordEmail = false;
+				
 			} else if (updateUser) {
+				
 				RootPanel.get("page").clear();
 				createChangeAccount();
 				updateUser = false;
 				//do nothing
+				
+			} else if (convertCurrency) {
+				
 			} else if (sendingWelcomeEmail) {
+				
 				createCreateAccount();
 				sendingWelcomeEmail = false;
+				
 			} else if (result == null) {
+				
 				System.out.println("Result is currently null");
 			}
     	
@@ -684,7 +697,7 @@ public class UserAccountController implements ControllerInterface {
 	
 	public void deleteAccount() {
 		deleteAccount = true;
-		db.addAccount(user.getUsername(), currentAccount, callbackVoid);
+		db.deleteAccount(user.getUsername(), currentAccount.getName(), callbackVoid);
 	}
 	
 }

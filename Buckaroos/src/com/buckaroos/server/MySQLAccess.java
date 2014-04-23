@@ -134,14 +134,14 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
         createStatementForConnection();
         try {
             String userPassword = user.getPassword();
-            String hashedPassword = hasher.hashPassword(userPassword);
+//            String hashedPassword = hasher.hashPassword(userPassword);
             query = connect.prepareStatement("insert into Credentials "
                     + "values (?, ?, ?)");
             query.setString(1, user.getUsername());
-            query.setString(2, hashedPassword);
+            query.setString(2, userPassword); //TODO
             query.setString(3, user.getEmail());
             query.executeUpdate();
-            System.out.println("hello?");
+            System.out.println("added user");
         } catch (SQLException e) {
             System.out.println("Exception caught when adding user.");
             e.printStackTrace();
@@ -162,6 +162,9 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
         User userToCheck = getUser(username);
         if (userToCheck.getPassword().equals(hashOfEnteredPassword)) {
             isPasswordCorrect = true;
+        }
+        if (enteredPassword.equals(userToCheck.getPassword())) {
+        	isPasswordCorrect = true;
         }
         return isPasswordCorrect;
     }
@@ -899,223 +902,230 @@ public class MySQLAccess extends RemoteServiceServlet implements DBConnection,
         }
     }
 
-    /**
-     * Call this method before performing any currency conversion to get live
-     * exchange rates.
-     */
-    public void setUpForCurrencyConversion() {
-        setExchangeRates();
-    }
+	@Override
+	public double convertCurrency(Enum<Money> fromCurrency,
+			Enum<Money> toCurrency, double amount) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
-    /**
-     * Converts a supported currency to another supported currency. Make sure
-     * you call setUpForCurrencyConversion() first to get updated exchange
-     * rates.
-     * 
-     * @param fromCurrency The currency to convert from
-     * @param toCurrency The currency to convert to
-     * @param amount The amount of currency to convert
-     * @return The amount of money in the new currency
-     */
-    public double convertCurrency(Enum<Money> fromCurrency,
-            Enum<Money> toCurrency, double amount) {
-        if (fromCurrency == null || toCurrency == null) {
-            throw new IllegalArgumentException("Can't convert from null or to "
-                    + "null currency.");
-        }
-        double newAmount = 0;
-        if (fromCurrency != Money.valueOf("USD")
-                && toCurrency != Money.valueOf("USD")) {
-            double fromCurrencyInDollars = convertToDollars(fromCurrency,
-                    amount);
-            newAmount = convertCurrency(Money.USD, toCurrency,
-                    fromCurrencyInDollars);
-        } else if (fromCurrency != Money.valueOf("USD")
-                && toCurrency == Money.valueOf("USD")) {
-            newAmount = convertToDollars(fromCurrency, amount);
-        } else if (fromCurrency == Money.valueOf("USD")
-                && toCurrency != Money.valueOf("USD")) {
-            newAmount = convertFromDollars(toCurrency, amount);
-        } else if (fromCurrency == toCurrency) {
-            newAmount = amount;
-        }
-        return newAmount;
-    }
-
-    /*
-     * Sets the current exchange rates for every currency that Buckaroos
-     * supports.
-     */
-    private static void setExchangeRates() {
-        try {
-            Map<Money, Float> conversionRates = getExchangeRates();
-            FROMUSDTOAUD = conversionRates.get(Money.AUD);
-            FROMUSDTOBRL = conversionRates.get(Money.BRL);
-            FROMUSDTOCAD = conversionRates.get(Money.CAD);
-            FROMUSDTOCNY = conversionRates.get(Money.CNY);
-            FROMUSDTOEUR = conversionRates.get(Money.EUR);
-            FROMUSDTOGBP = conversionRates.get(Money.GBP);
-            FROMUSDTOJPY = conversionRates.get(Money.JPY);
-            FROMUSDTOINR = conversionRates.get(Money.INR);
-            FROMUSDTOCHF = conversionRates.get(Money.CHF);
-            FROMUSDTORUB = conversionRates.get(Money.RUB);
-            FROMUSDTOMXN = conversionRates.get(Money.MXN);
-            FROMUSDTOAED = conversionRates.get(Money.AED);
-            FROMUSDTOBDT = conversionRates.get(Money.BDT);
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    /*
-     * Gets the current exchange rates for all Buckaroos supported currencies.
-     * 
-     * @return The exchange rate for the currencies.
-     * 
-     * @throws ClientProtocolException
-     * 
-     * @throws IOException
-     */
-    @SuppressWarnings({ "resource", "deprecation" })
-    private static Map<Money, Float> getExchangeRates() throws IOException {
-        Map<Money, Float> conversionRates = new HashMap<>();
-        HttpClient httpclient = new DefaultHttpClient();
-        StringBuffer sb = new StringBuffer();
-        for (Money currency : Money.values()) {
-            sb.append("s=").append("USD")
-                    .append(cInfo.getCurrencyCode(currency)).append("=X&");
-        }
-        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?"
-                + sb + "f=l1&e=.csv");
-        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        String responseBody = httpclient.execute(httpGet, responseHandler);
-        httpclient.getConnectionManager().shutdown();
-        String[] lines = responseBody.split("\n");
-        if (lines.length != Money.values().length) {
-            throw new IllegalStateException("Currency data mismatch");
-        }
-        int i = 0;
-        float exchange;
-        for (Money currency : Money.values()) {
-            exchange = Float.parseFloat(lines[i++]);
-            conversionRates.put(currency, exchange);
-        }
-        return conversionRates;
-    }
-
-    /*
-     * Converts the amount of money provided using the exchange rate of the
-     * currency taken in to US Dollars.
-     * 
-     * @param fromCurrency The currency to convert from
-     * 
-     * @param amount The amount of money to convert
-     * 
-     * @return The value of the amount provided in US Dollars
-     */
-    private double convertToDollars(Enum<Money> fromCurrency, double amount) {
-        double valueInDollars = -1;
-        double conversionRate = 0;
-        if (fromCurrency == Money.valueOf("AUD")) {
-            conversionRate = 1 / FROMUSDTOAUD;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("BRL")) {
-            conversionRate = 1 / FROMUSDTOBRL;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("CAD")) {
-            conversionRate = 1 / FROMUSDTOCAD;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("CNY")) {
-            conversionRate = 1 / FROMUSDTOCNY;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("EUR")) {
-            conversionRate = 1 / FROMUSDTOEUR;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("GBP")) {
-            conversionRate = 1 / FROMUSDTOGBP;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("JPY")) {
-            conversionRate = 1 / FROMUSDTOJPY;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("INR")) {
-            conversionRate = 1 / FROMUSDTOINR;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("CHF")) {
-            conversionRate = 1 / FROMUSDTOCHF;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("RUB")) {
-            conversionRate = 1 / FROMUSDTORUB;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("MXN")) {
-            conversionRate = 1 / FROMUSDTOMXN;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("AED")) {
-            conversionRate = 1 / FROMUSDTOAED;
-            valueInDollars = amount * conversionRate;
-        } else if (fromCurrency == Money.valueOf("BDT")) {
-            conversionRate = 1 / FROMUSDTOBDT;
-            valueInDollars = amount * conversionRate;
-        }
-        return valueInDollars;
-    }
-
-    /*
-     * Converts the amount of money provided using the exchange rate of the
-     * currency taken in to the type of currency provided.
-     * 
-     * @param toCurrency The currency to convert to
-     * 
-     * @param amount The amount of money to convert
-     * 
-     * @return The value of the amount provided in the type of currency provided
-     */
-    private double convertFromDollars(Enum<Money> toCurrency, double amount) {
-        double newValue = -1;
-        double conversionRate = 0;
-        if (toCurrency == Money.valueOf("AUD")) {
-            conversionRate = FROMUSDTOAUD;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("BRL")) {
-            conversionRate = FROMUSDTOBRL;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("CAD")) {
-            conversionRate = FROMUSDTOCAD;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("CNY")) {
-            conversionRate = FROMUSDTOCNY;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("EUR")) {
-            conversionRate = FROMUSDTOEUR;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("GBP")) {
-            conversionRate = FROMUSDTOGBP;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("JPY")) {
-            conversionRate = FROMUSDTOJPY;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("INR")) {
-            conversionRate = FROMUSDTOINR;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("CHF")) {
-            conversionRate = FROMUSDTOCHF;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("RUB")) {
-            conversionRate = FROMUSDTORUB;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("MXN")) {
-            conversionRate = FROMUSDTOMXN;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("AED")) {
-            conversionRate = FROMUSDTOAED;
-            newValue = amount * conversionRate;
-        } else if (toCurrency == Money.valueOf("BDT")) {
-            conversionRate = FROMUSDTOBDT;
-            newValue = amount * conversionRate;
-        }
-        return newValue;
-    }
+//    /**
+//     * Call this method before performing any currency conversion to get live
+//     * exchange rates.
+//     */
+//    public void setUpForCurrencyConversion() {
+//        setExchangeRates();
+//    }
+//
+//    /**
+//     * Converts a supported currency to another supported currency. Make sure
+//     * you call setUpForCurrencyConversion() first to get updated exchange
+//     * rates.
+//     * 
+//     * @param fromCurrency The currency to convert from
+//     * @param toCurrency The currency to convert to
+//     * @param amount The amount of currency to convert
+//     * @return The amount of money in the new currency
+//     */
+//    public double convertCurrency(Enum<Money> fromCurrency,
+//            Enum<Money> toCurrency, double amount) {
+//        if (fromCurrency == null || toCurrency == null) {
+//            throw new IllegalArgumentException("Can't convert from null or to "
+//                    + "null currency.");
+//        }
+//        double newAmount = 0;
+//        if (fromCurrency != Money.valueOf("USD")
+//                && toCurrency != Money.valueOf("USD")) {
+//            double fromCurrencyInDollars = convertToDollars(fromCurrency,
+//                    amount);
+//            newAmount = convertCurrency(Money.USD, toCurrency,
+//                    fromCurrencyInDollars);
+//        } else if (fromCurrency != Money.valueOf("USD")
+//                && toCurrency == Money.valueOf("USD")) {
+//            newAmount = convertToDollars(fromCurrency, amount);
+//        } else if (fromCurrency == Money.valueOf("USD")
+//                && toCurrency != Money.valueOf("USD")) {
+//            newAmount = convertFromDollars(toCurrency, amount);
+//        } else if (fromCurrency == toCurrency) {
+//            newAmount = amount;
+//        }
+//        return newAmount;
+//    }
+//
+//    /*
+//     * Sets the current exchange rates for every currency that Buckaroos
+//     * supports.
+//     */
+//    private static void setExchangeRates() {
+//        try {
+//            Map<Money, Float> conversionRates = getExchangeRates();
+//            FROMUSDTOAUD = conversionRates.get(Money.AUD);
+//            FROMUSDTOBRL = conversionRates.get(Money.BRL);
+//            FROMUSDTOCAD = conversionRates.get(Money.CAD);
+//            FROMUSDTOCNY = conversionRates.get(Money.CNY);
+//            FROMUSDTOEUR = conversionRates.get(Money.EUR);
+//            FROMUSDTOGBP = conversionRates.get(Money.GBP);
+//            FROMUSDTOJPY = conversionRates.get(Money.JPY);
+//            FROMUSDTOINR = conversionRates.get(Money.INR);
+//            FROMUSDTOCHF = conversionRates.get(Money.CHF);
+//            FROMUSDTORUB = conversionRates.get(Money.RUB);
+//            FROMUSDTOMXN = conversionRates.get(Money.MXN);
+//            FROMUSDTOAED = conversionRates.get(Money.AED);
+//            FROMUSDTOBDT = conversionRates.get(Money.BDT);
+//        } catch (ClientProtocolException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    /*
+//     * Gets the current exchange rates for all Buckaroos supported currencies.
+//     * 
+//     * @return The exchange rate for the currencies.
+//     * 
+//     * @throws ClientProtocolException
+//     * 
+//     * @throws IOException
+//     */
+//    @SuppressWarnings({ "resource", "deprecation" })
+//    private static Map<Money, Float> getExchangeRates() throws IOException {
+//        Map<Money, Float> conversionRates = new HashMap<>();
+//        HttpClient httpclient = new DefaultHttpClient();
+//        StringBuffer sb = new StringBuffer();
+//        for (Money currency : Money.values()) {
+//            sb.append("s=").append("USD")
+//                    .append(cInfo.getCurrencyCode(currency)).append("=X&");
+//        }
+//        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?"
+//                + sb + "f=l1&e=.csv");
+//        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+//        String responseBody = httpclient.execute(httpGet, responseHandler);
+//        httpclient.getConnectionManager().shutdown();
+//        String[] lines = responseBody.split("\n");
+//        if (lines.length != Money.values().length) {
+//            throw new IllegalStateException("Currency data mismatch");
+//        }
+//        int i = 0;
+//        float exchange;
+//        for (Money currency : Money.values()) {
+//            exchange = Float.parseFloat(lines[i++]);
+//            conversionRates.put(currency, exchange);
+//        }
+//        return conversionRates;
+//    }
+//
+//    /*
+//     * Converts the amount of money provided using the exchange rate of the
+//     * currency taken in to US Dollars.
+//     * 
+//     * @param fromCurrency The currency to convert from
+//     * 
+//     * @param amount The amount of money to convert
+//     * 
+//     * @return The value of the amount provided in US Dollars
+//     */
+//    private double convertToDollars(Enum<Money> fromCurrency, double amount) {
+//        double valueInDollars = -1;
+//        double conversionRate = 0;
+//        if (fromCurrency == Money.valueOf("AUD")) {
+//            conversionRate = 1 / FROMUSDTOAUD;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("BRL")) {
+//            conversionRate = 1 / FROMUSDTOBRL;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("CAD")) {
+//            conversionRate = 1 / FROMUSDTOCAD;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("CNY")) {
+//            conversionRate = 1 / FROMUSDTOCNY;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("EUR")) {
+//            conversionRate = 1 / FROMUSDTOEUR;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("GBP")) {
+//            conversionRate = 1 / FROMUSDTOGBP;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("JPY")) {
+//            conversionRate = 1 / FROMUSDTOJPY;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("INR")) {
+//            conversionRate = 1 / FROMUSDTOINR;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("CHF")) {
+//            conversionRate = 1 / FROMUSDTOCHF;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("RUB")) {
+//            conversionRate = 1 / FROMUSDTORUB;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("MXN")) {
+//            conversionRate = 1 / FROMUSDTOMXN;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("AED")) {
+//            conversionRate = 1 / FROMUSDTOAED;
+//            valueInDollars = amount * conversionRate;
+//        } else if (fromCurrency == Money.valueOf("BDT")) {
+//            conversionRate = 1 / FROMUSDTOBDT;
+//            valueInDollars = amount * conversionRate;
+//        }
+//        return valueInDollars;
+//    }
+//
+//    /*
+//     * Converts the amount of money provided using the exchange rate of the
+//     * currency taken in to the type of currency provided.
+//     * 
+//     * @param toCurrency The currency to convert to
+//     * 
+//     * @param amount The amount of money to convert
+//     * 
+//     * @return The value of the amount provided in the type of currency provided
+//     */
+//    private double convertFromDollars(Enum<Money> toCurrency, double amount) {
+//        double newValue = -1;
+//        double conversionRate = 0;
+//        if (toCurrency == Money.valueOf("AUD")) {
+//            conversionRate = FROMUSDTOAUD;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("BRL")) {
+//            conversionRate = FROMUSDTOBRL;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("CAD")) {
+//            conversionRate = FROMUSDTOCAD;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("CNY")) {
+//            conversionRate = FROMUSDTOCNY;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("EUR")) {
+//            conversionRate = FROMUSDTOEUR;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("GBP")) {
+//            conversionRate = FROMUSDTOGBP;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("JPY")) {
+//            conversionRate = FROMUSDTOJPY;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("INR")) {
+//            conversionRate = FROMUSDTOINR;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("CHF")) {
+//            conversionRate = FROMUSDTOCHF;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("RUB")) {
+//            conversionRate = FROMUSDTORUB;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("MXN")) {
+//            conversionRate = FROMUSDTOMXN;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("AED")) {
+//            conversionRate = FROMUSDTOAED;
+//            newValue = amount * conversionRate;
+//        } else if (toCurrency == Money.valueOf("BDT")) {
+//            conversionRate = FROMUSDTOBDT;
+//            newValue = amount * conversionRate;
+//        }
+//        return newValue;
+//    }
 }

@@ -77,8 +77,8 @@ public interface DBConnection extends RemoteService {
     List<AccountTransaction> getCurrentTransactions(String username,
             String accountName);
 
-    void setUpForCurrencyConversion();
+//    void setUpForCurrencyConversion();
 
-    double convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
-            double amount);
+//    double convertCurrency(Enum<Money> fromCurrency, Enum<Money> toCurrency,
+//            double amount);
 }
