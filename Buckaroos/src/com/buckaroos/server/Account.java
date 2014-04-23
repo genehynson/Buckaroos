@@ -43,7 +43,7 @@ public class Account implements IsSerializable  {
      * 
      * @param balance
      */
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

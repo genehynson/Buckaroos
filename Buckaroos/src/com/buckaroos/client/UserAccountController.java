@@ -759,7 +759,7 @@ public class UserAccountController implements ControllerInterface {
 	}
 	public void deleteTransaction(AccountTransaction t) {
 		deleteTransaction = true;
-		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getTime(), t.getDate(), callbackTransaction);
+		db.deleteTransaction(user.getUsername(), currentAccount.getName(), t.getAmount(), t.getCategory(), t.getDate(), t.getTime(), callbackTransaction);
 	}
 	
 	public void rollbackTransaction(AccountTransaction t) {
