@@ -545,12 +545,15 @@ public class UserAccountController implements ControllerInterface {
 				updateCurrentUser = false;
 				
 			} else if (updateCurrentAccount) {
-				
-				currentAccount = (Account) result;
-				System.out.println(currentAccount.getName());
-				updateCurrentAccount = false;
-				db.getAllTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
-				createAccountOverview = true;
+				if (result != null) {
+					currentAccount = (Account) result;
+					System.out.println(currentAccount.getName());
+					updateCurrentAccount = false;
+					db.getCurrentTransactions(user.getUsername(), currentAccount.getName(), callbackListTransactions);
+					createAccountOverview = true;
+				} else  {
+					createAccountOverview();
+				}
 				
 			} else if (doesLoginAccountExist) {
 				
@@ -597,10 +600,16 @@ public class UserAccountController implements ControllerInterface {
 				RootPanel.get("page").clear();
 				createAccountOverview();
 				deleteTransaction = false;
+				
 			} else if (editTransaction) {
+				
 				editTransaction = false;
+				RootPanel.get("page").clear();
+				createAccountOverview();
+				
 			} else if (deleteAccount) {
 				
+				deleteAccount = false;
 				RootPanel.get("page").clear();
 				createChangeAccount();
 				
@@ -624,6 +633,8 @@ public class UserAccountController implements ControllerInterface {
 				//do nothing
 				
 			} else if (convertCurrency) {
+				
+				convertCurrency = false;
 				
 			} else if (sendingWelcomeEmail) {
 				

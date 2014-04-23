@@ -126,18 +126,20 @@ public class Transaction extends Composite {
 					if (withdraw.getValue()) {
 						if (editing) {
 							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-									chosen, "Withdrawl");
+									chosen, "Withdrawal");
 							editing = false;
-						}
-						controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+						} else {
+							controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
 								chosen);
+						}
 					} else if (deposit.getValue()) {
 						if (editing) {
 							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
 									chosen, "Deposit");
 							editing = false;
+						} else {
+							controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
 						}
-						controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
 
 					}
 				} else {
