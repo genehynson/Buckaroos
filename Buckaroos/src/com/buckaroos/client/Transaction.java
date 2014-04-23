@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -93,6 +94,7 @@ public class Transaction extends Composite {
 		category.addStyleName("field-box");
 
     	withdraw = new RadioButton("type");
+    	withdraw.setValue(true);
     	deposit = new RadioButton("type");
     	withdraw.setText("Withdraw");
     	withdraw.addStyleName("white-text");
@@ -118,22 +120,26 @@ public class Transaction extends Composite {
 					String categoryText = category.getText().toString().toLowerCase();
 					System.out.println(controller.getCurrentUser().getUsername());
 					System.out.println(controller.getCurrentAccount().getName());
-					if (withdraw.getValue()) {
-						if (editing) {
-							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-									chosen, "Withdrawl");
-							editing = false;
-						}
-						controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-								chosen);
-					} else if (deposit.getValue()) {
-						if (editing) {
-							controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
-									chosen, "Deposit");
-							editing = false;
-						}
-						controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
+					if (datePicker.getHighlightedDate() != null && !category.getText().equals("") && amount.getText().equals("")) {
+						if (withdraw.getValue()) {
+							if (editing) {
+								controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+										chosen, "Withdrawl");
+								editing = false;
+							}
+							controller.addWithdrawal(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+									chosen);
+						} else if (deposit.getValue()) {
+							if (editing) {
+								controller.completeEditTransaction(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText,
+										chosen, "Deposit");
+								editing = false;
+							}
+							controller.addDeposit(newAmount, currencyBox.getItemText(currencyBox.getSelectedIndex()), categoryText, chosen);
 
+						}
+					} else {
+						Window.alert("Please enter all fields.");
 					}
 				}
 			}
