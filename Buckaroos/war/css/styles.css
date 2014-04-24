@@ -12,6 +12,10 @@ body {
 	color: black;
 }
 
+.hyperlink {
+	color: #428bca;
+	text-decoration: underline;
+}
 .title {
 	font-size: 200%;
 }
