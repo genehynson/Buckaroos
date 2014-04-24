@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.buckaroos.server.AccountTransaction;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,13 +37,14 @@ public class Reports extends Composite {
 	Label title;
 	Label dash;
 	DateBox fromDate, toDate;
-	RadioButton spendingReport, cashFlow, incomeReport;
+	RadioButton spendingReport, cashFlow, incomeReport, transactionHistory;
 	
     private ControllerInterface controller;
     private Panel vPanel, hPanel, radioButtonPanel;
     private String beginDate, afterDate;
     private Map<String, Double> categoryTotals;
     private List<String> categoryNames;
+    private Map<String, List<AccountTransaction>> history;
     
 
     interface ReportsUiBinder extends UiBinder<Widget, Reports> {
@@ -74,6 +76,15 @@ public class Reports extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				controller.generateSpendingCategoryReport();
+			}
+		});
+    	transactionHistory = new RadioButton("type");
+    	transactionHistory.setText("Transaction History");
+    	transactionHistory.addStyleName("white-text");
+    	transactionHistory.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controller.generateTransactionHistory();
 			}
 		});
     	cashFlow = new RadioButton("type");
@@ -148,6 +159,7 @@ public class Reports extends Composite {
 		radioButtonPanel.add(spendingReport);
 		radioButtonPanel.add(cashFlow);
 		radioButtonPanel.add(incomeReport);
+		radioButtonPanel.add(transactionHistory);
 		
 		hPanel = new HorizontalPanel();
 		hPanel.add(fromDate);
@@ -181,6 +193,51 @@ public class Reports extends Composite {
 		radioButtonPanel.add(spendingReport);
 		radioButtonPanel.add(cashFlow);
 		radioButtonPanel.add(incomeReport);
+		radioButtonPanel.add(transactionHistory);
+		
+		hPanel = new HorizontalPanel();
+		hPanel.add(fromDate);
+		hPanel.add(dash);
+		hPanel.add(toDate);
+		vPanel = new VerticalPanel();
+		vPanel.add(title);
+		vPanel.add(radioButtonPanel);
+		vPanel.add(hPanel);
+		vPanel.add(table);
+		vPanel.add(menu);
+		RootPanel.get("page").add(vPanel);
+    }
+    
+    private void buildTableHistory() {
+    	RootPanel.get("page").clear();
+		table = new FlexTable();
+		table.addStyleName("white-text");
+		int i = 0;
+		for (AccountTransaction trans : history.get("RolledBack")) {
+			table.setText(i,0, "RolledBack");
+			table.setText(i,1, trans.getCategory());
+			table.setText(i,2, "Total: " + trans.getAmount());
+			table.getCellFormatter().addStyleName(i, 0, "table-styling");
+			table.getCellFormatter().addStyleName(i, 1, "table-styling");
+			table.getCellFormatter().addStyleName(i, 2, "table-styling");
+			i++;
+		}
+		
+		for (AccountTransaction trans : history.get("Committed")) {
+			table.setText(i,0, "Committed");
+			table.setText(i,1, trans.getCategory());
+			table.setText(i,2, "Total: " + trans.getAmount());
+			table.getCellFormatter().addStyleName(i, 0, "table-styling");
+			table.getCellFormatter().addStyleName(i, 1, "table-styling");
+			table.getCellFormatter().addStyleName(i, 2, "table-styling");
+			i++;
+		}
+		
+		radioButtonPanel = new VerticalPanel();
+		radioButtonPanel.add(spendingReport);
+		radioButtonPanel.add(cashFlow);
+		radioButtonPanel.add(incomeReport);
+		radioButtonPanel.add(transactionHistory);
 		
 		hPanel = new HorizontalPanel();
 		hPanel.add(fromDate);
@@ -195,10 +252,16 @@ public class Reports extends Composite {
 		RootPanel.get("page").add(vPanel);
     }
 		
+		
     public void setTransactionLists(Map<String, Double> transactions, List<String> names) {
     	categoryTotals = transactions;
     	categoryNames = names;
     	buildTable();
+    }
+    
+    public void setTransactionListsHistory(Map<String, List<AccountTransaction>> transactions) {
+    	history = transactions;
+    	buildTableHistory();
     }
 
 }

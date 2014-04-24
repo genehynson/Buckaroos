@@ -217,4 +217,6 @@ public interface ControllerInterface {
 	public abstract void rollbackTransaction(
 			AccountTransaction accountTransaction);
 
+	public abstract void generateTransactionHistory();
+
 }

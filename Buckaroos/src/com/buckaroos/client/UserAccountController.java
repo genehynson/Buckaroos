@@ -37,6 +37,7 @@ public class UserAccountController implements ControllerInterface {
     private static List<Account> userAccounts = new ArrayList<Account>();
     private static List<AccountTransaction> userTransactions = new ArrayList<AccountTransaction>();
     private static Map<String, Double> reportTransactions;
+    private static Map<String, List<AccountTransaction>> reportTransactionsHistory;
     private static List<String> reportTransactionNames;
     
     private String aPassword;
@@ -65,6 +66,7 @@ public class UserAccountController implements ControllerInterface {
     private AsyncCallback<List<AccountTransaction>> callbackListTransactions;
     private AsyncCallback<ArrayList<Account>> callbackListAccounts;
     private AsyncCallback<HashMap<String, Double>> callbackHashMap;
+    private AsyncCallback<Map<String, List<AccountTransaction>>> callbackHistory;
     private AsyncCallback<Double> callbackDouble; 
     private AsyncCallback<Boolean> callbackBoolean;
     private AsyncCallback callbackVoid;
@@ -90,6 +92,7 @@ public class UserAccountController implements ControllerInterface {
     private boolean convertCurrency = false;
     private boolean checkPassword = false;
     private boolean rollbackTransaction = false;
+    private boolean changeDatesHistory = false;
     /**
      * Gets user/DB after login from CredientialConfirmer in Login activity.
      * 
@@ -105,6 +108,7 @@ public class UserAccountController implements ControllerInterface {
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
     	callbackVoid = new CallbackHandler();
+    	callbackHistory = new CallbackHandler<Map<String, List<AccountTransaction>>>();
 
     }
 
@@ -116,6 +120,7 @@ public class UserAccountController implements ControllerInterface {
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
     	callbackVoid = new CallbackHandler();
+    	callbackHistory = new CallbackHandler<Map<String, List<AccountTransaction>>>();
 
     }
     
@@ -127,6 +132,7 @@ public class UserAccountController implements ControllerInterface {
     	callbackListAccounts = new CallbackHandler<ArrayList<Account>>();
     	callbackHashMap = new CallbackHandler<HashMap<String, Double>>();
     	callbackVoid = new CallbackHandler();
+    	callbackHistory = new CallbackHandler<Map<String, List<AccountTransaction>>>();
 
     	
     	reportTransactions = new HashMap<String, Double>();
@@ -466,6 +472,12 @@ public class UserAccountController implements ControllerInterface {
     }
     
     @Override
+    public void generateTransactionHistory() {
+    	changeDatesHistory = true;
+    	db.getTransactionHistoryInfo(user.getUsername(), currentAccount.getName(), beginDate, endDate, callbackHistory);
+    }
+    
+    @Override
     public void resetPassword(String username) {
     	sendingResetPasswordEmail = true;
     	db.getUser(username, callbackUser);
@@ -599,6 +611,13 @@ public class UserAccountController implements ControllerInterface {
 				reportTransactionNames.addAll(reportTransactions.keySet());
 				reports.setTransactionLists(reportTransactions, reportTransactionNames);
 				changeDates = false;
+				
+			} else if (changeDatesHistory) {
+				
+				reportTransactionsHistory = new HashMap<String, List<AccountTransaction>>();
+				reportTransactionsHistory = (Map<String, List<AccountTransaction>>) result;
+				reports.setTransactionListsHistory(reportTransactionsHistory);
+				changeDatesHistory = false;
 				
 			} else if (deleteTransaction) {
 				
