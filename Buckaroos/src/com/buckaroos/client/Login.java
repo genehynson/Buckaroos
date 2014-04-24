@@ -46,8 +46,9 @@ public class Login extends Composite {
 	private void buildLogin() {
 		title = new Label();
 		title.setText("buckaroos");
-		passwordReset = new Label("Forgot Password");
+		passwordReset = new Label("Forgot password?");
 		passwordReset.addStyleName("white-text");
+		passwordReset.addStyleName("hyperlink");
 		passwordReset.addStyleName("clickable");
 		passwordReset.addClickHandler(new ClickHandler() {
 			@Override

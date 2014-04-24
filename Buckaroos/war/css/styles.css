@@ -12,6 +12,10 @@ body {
 	color: black;
 }
 
+.hyperlink {
+	color: #428bca;
+	text-decoration: underline;
+}
 .title {
 	font-size: 200%;
 }
@@ -23,6 +27,7 @@ body {
 .field-box {
 	border-radius: 4px;
 	width: 100%;
+	margin-bottom: 15px;
 }
 
 .clickable {
@@ -377,7 +382,7 @@ fieldset[disabled] .btn-glass.active {
   border-color: rgba(256,256,256,0.5);
   //color: white;
   box-shadow: inset 0 0 25px #666666;
-  padding: 30px;
+  padding: 15px;
   
 }
 .glass-panel h1,
