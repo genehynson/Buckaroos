@@ -213,26 +213,31 @@ public class Reports extends Composite {
 		table = new FlexTable();
 		table.addStyleName("white-text");
 		int i = 0;
-		for (AccountTransaction trans : history.get("RolledBack")) {
-			table.setText(i,0, "RolledBack");
-			table.setText(i,1, trans.getCategory());
-			table.setText(i,2, "Total: " + trans.getAmount());
-			table.getCellFormatter().addStyleName(i, 0, "table-styling");
-			table.getCellFormatter().addStyleName(i, 1, "table-styling");
-			table.getCellFormatter().addStyleName(i, 2, "table-styling");
-			i++;
+		if (history.containsKey("RolledBack")) {
+			for (AccountTransaction trans : history.get("RolledBack")) {
+				table.setText(i,0, "RolledBack");
+				table.setText(i,1, trans.getCategory());
+				table.setText(i,2, "Total: " + trans.getAmount());
+				table.getCellFormatter().addStyleName(i, 0, "table-styling");
+				table.getCellFormatter().addStyleName(i, 1, "table-styling");
+				table.getCellFormatter().addStyleName(i, 2, "table-styling");
+				i++;
+			}
 		}
-		
-		for (AccountTransaction trans : history.get("Committed")) {
-			table.setText(i,0, "Committed");
-			table.setText(i,1, trans.getCategory());
-			table.setText(i,2, "Total: " + trans.getAmount());
-			table.getCellFormatter().addStyleName(i, 0, "table-styling");
-			table.getCellFormatter().addStyleName(i, 1, "table-styling");
-			table.getCellFormatter().addStyleName(i, 2, "table-styling");
-			i++;
+
+		if (history.containsKey("Committed")) {
+
+			for (AccountTransaction trans : history.get("Committed")) {
+				table.setText(i,0, "Committed");
+				table.setText(i,1, trans.getCategory());
+				table.setText(i,2, "Total: " + trans.getAmount());
+				table.getCellFormatter().addStyleName(i, 0, "table-styling");
+				table.getCellFormatter().addStyleName(i, 1, "table-styling");
+				table.getCellFormatter().addStyleName(i, 2, "table-styling");
+				i++;
+			}
 		}
-		
+
 		radioButtonPanel = new VerticalPanel();
 		radioButtonPanel.add(spendingReport);
 		radioButtonPanel.add(cashFlow);
