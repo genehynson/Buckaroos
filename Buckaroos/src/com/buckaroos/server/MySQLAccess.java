@@ -125,12 +125,12 @@ public class MySQLAccess extends RemoteServiceServlet implements
         createStatementForConnection();
         try {
             String userPassword = user.getPassword();
-            // String hashedPassword = hasher.hashPassword(userPassword);
+            String hashedPassword = hasher.hashPassword(userPassword);
             query =
                     connect.prepareStatement("insert into Credentials "
                             + "values (?, ?, ?)");
             query.setString(1, user.getUsername());
-            query.setString(2, userPassword); // TODO
+            query.setString(2, hashedPassword);
             query.setString(3, user.getEmail());
             query.executeUpdate();
             System.out.println("added user");
