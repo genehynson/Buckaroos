@@ -528,21 +528,20 @@ public class MySQLAccess extends RemoteServiceServlet implements
      * to know which type of report to retrieve info for. Returns null if a
      * database error occurs
      */
-    private HashMap<String, Double> getTransactionCategoryInfo(
-            String username, String accountName, String startDate,
-            String endDate, String transType) {
+    private HashMap<String, Double> getTransactionCategoryInfo(String username,
+            String accountName, String startDate, String endDate,
+            String transType) {
         // The date passed in needs to be formatted as YYYY/MM/DD
         createStatementForConnection();
         try {
             HashMap<String, Double> categoryMap = new HashMap<>();
-            String selectQuery =
-                    "SELECT Category, SUM(Amount) AS amount FROM "
-                            + "Transactions WHERE Username = '" + username
-                            + "' AND " + "AccountName = '" + accountName
-                            + "' AND " + "TransactionType = '" + transType
-                            + "' AND TransactionDate > '" + startDate
-                            + "' AND TransactionDate < '" + endDate
-                            + "' GROUP " + "BY Category";
+            String selectQuery = "SELECT Category, SUM(Amount) AS amount FROM "
+                    + "Transactions WHERE Username = '" + username + "' AND "
+                    + "AccountName = '" + accountName + "' AND "
+                    + "TransactionType = '" + transType
+                    + "' AND TransactionDate > '" + startDate
+                    + "' AND TransactionDate < '" + endDate + "' AND "
+                    + "isRolledBack = 'N' GROUP BY Category";
             ResultSet aResultSet = statement.executeQuery(selectQuery);
             while (aResultSet.next()) {
                 String category = aResultSet.getString(1);
